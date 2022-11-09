@@ -30,13 +30,13 @@ jobs:
         run: |
           echo ::set-output name=tags::$(make tags)"
           echo ::set-output name=tag::$(make tag)"
-        working-directory: ./Learn-And-Do-Server
+        working-directory: ./
 
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./Learn-And-Do-Server
-          file: ./Learn-And-Do-Server/devops/Dockerfile
+          context: ./
+          file: ./devops/Dockerfile
           push: true
           tags: ${{ steps.manifests.outputs.tags }}
 
