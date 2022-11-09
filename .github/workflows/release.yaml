@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      
+
       - uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
@@ -24,19 +24,19 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-        
+
       - name: Generate manifests
         id: manifests
         run: |
           echo ::set-output name=tags::$(make tags)"
           echo ::set-output name=tag::$(make tag)"
-        working-directory: ./learn-and-do-server
+        working-directory: ./Learn-And-Do-Server
 
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./learn-and-do-server
-          file: ./learn-and-do-server/devops/Dockerimage
+          context: ./Learn-And-Do-Server
+          file: ./Learn-And-Do-Server/devops/Dockerfile
           push: true
           tags: ${{ steps.manifests.outputs.tags }}
 
@@ -52,14 +52,14 @@ jobs:
           key: ${{ secrets.EC2_SECRET_KEY }}
           port: 22
           script: |
-            export LIBRATE_RUNNER=$(docker ps --filter=name=literate --format={{.Names}})
-            [[ ! -z $LIBRATE_RUNNER ]] && docker rm literate &&\
+            export LITERATE_RUNNER=$(docker ps --filter=name=literate --format={{.Names}})
+            [[ ! -z $LITERATE_RUNNER ]] && docker rm literate && \
             docker run --name literate \
-            --env PG_USERNAME=${{ secrets.PG_USERNAME }}\
-            --env PG_PASSWORD=${{ secrets.PG_PASSWORD }}\
-            --env PG_HOST=${{ secrets.PG_HOST }}\
-            --env PG_PORT=${{ secrets.PG_PORT }}\
-            --env PG_DATABASE=${{ secrets.PG_DATABASE }}\
+            --env PG_USERNAME=${{ secrets.PG_USERNAME }} \
+            --env PG_PASSWORD=${{ secrets.PG_PASSWORD }} \
+            --env PG_HOST=${{ secrets.PG_HOST }} \
+            --env PG_PORT=${{ secrets.PG_PORT }} \
+            --env PG_DATABASE=${{ secrets.PG_DATABASE }} \
             -p 8080:8080 \
-            ${{ needs.build.output.tag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/literate:${{ needs.build.output.tag }}
             
