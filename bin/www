@@ -1,0 +1,39 @@
+const debug = require("debug")("literate-server:server");
+const http = require("http");
+const app = require("../src/app");
+const db = require("../src/models");
+const { PORT, HOST } = require("../src/util/constraints");
+
+app.set("port", PORT);
+
+const server = http.createServer(app);
+
+const onError = (error) => {
+  if (error.syscall !== "listen") throw error;
+
+  switch (error.code) {
+    case "EACCES":
+      console.error(PORT.toString() + " requires elevated privileges");
+      process.exit(1);
+    case "EADDRINUSE":
+      console.error(PORT.toString() + " is already in use");
+      process.exit(1);
+    default:
+      throw error;
+  }
+};
+
+const onListening = () => {
+  debug("Listening on " + PORT.toString());
+};
+
+const onPgConnection = () => {
+  db.sequelize
+    .authenticate()
+    .then(() => console.log("🚀 Postgres: Connection Succeeded."))
+    .catch((err) => console.error(err));
+};
+
+server.listen(PORT, HOST, onPgConnection);
+server.on("error", onError);
+server.on("listening", onListening);

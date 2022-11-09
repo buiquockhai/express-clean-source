@@ -1,0 +1,65 @@
+name: Build And Release
+
+on:
+  push:
+    branches:
+      - 'release'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.manifests.outputs.tag }}
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
+      - name: Generate manifests
+        id: manifests
+        run: |
+          echo ::set-output name=tags::$(make tags)"
+          echo ::set-output name=tag::$(make tag)"
+        working-directory: ./learn-and-do-server
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: ./learn-and-do-server
+          file: ./learn-and-do-server/devops/Dockerimage
+          push: true
+          tags: ${{ steps.manifests.outputs.tags }}
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Remote access EC2 and replace image
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SECRET_KEY }}
+          port: 22
+          script: |
+            export LIBRATE_RUNNER=$(docker ps --filter=name=literate --format={{.Names}})
+            [[ ! -z $LIBRATE_RUNNER ]] && docker rm literate &&\
+            docker run --name literate \
+            --env PG_USERNAME=${{ secrets.PG_USERNAME }}\
+            --env PG_PASSWORD=${{ secrets.PG_PASSWORD }}\
+            --env PG_HOST=${{ secrets.PG_HOST }}\
+            --env PG_PORT=${{ secrets.PG_PORT }}\
+            --env PG_DATABASE=${{ secrets.PG_DATABASE }}\
+            -p 8080:8080 \
+            ${{ needs.build.output.tag }}
+            
