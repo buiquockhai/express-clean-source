@@ -62,6 +62,6 @@ jobs:
             --env PG_HOST=${{ secrets.PG_HOST }} \
             --env PG_PORT=${{ secrets.PG_PORT }} \
             --env PG_DATABASE=${{ secrets.PG_DATABASE }} \
-            -p 8080:8080 -d \
+            -p 8000:8000 -d \
             ${{ secrets.DOCKERHUB_USERNAME }}/literate:${{ needs.build.outputs.tag }}
             
