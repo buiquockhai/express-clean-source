@@ -27,16 +27,18 @@ jobs:
 
       - name: Generate manifests
         id: manifests
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
-          echo ::set-output name=tags::$(make tags)"
-          echo ::set-output name=tag::$(make tag)"
-        working-directory: ./Learn-And-Do-Server
+          echo "tags=$(make tags)" >> $GITHUB_OUTPUT
+          echo "tag=$(make tag)" >> $GITHUB_OUTPUT
+        working-directory: ./
 
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./Learn-And-Do-Server
-          file: ./Learn-And-Do-Server/devops/Dockerfile
+          context: ./
+          file: ./devops/Dockerfile
           push: true
           tags: ${{ steps.manifests.outputs.tags }}
 
@@ -53,13 +55,13 @@ jobs:
           port: 22
           script: |
             export LITERATE_RUNNER=$(docker ps --filter=name=literate --format={{.Names}})
-            [[ ! -z $LITERATE_RUNNER ]] && docker rm literate && \
+            [[ ! -z $LITERATE_RUNNER ]] && docker rm -f literate
             docker run --name literate \
             --env PG_USERNAME=${{ secrets.PG_USERNAME }} \
             --env PG_PASSWORD=${{ secrets.PG_PASSWORD }} \
             --env PG_HOST=${{ secrets.PG_HOST }} \
             --env PG_PORT=${{ secrets.PG_PORT }} \
             --env PG_DATABASE=${{ secrets.PG_DATABASE }} \
-            -p 8080:8080 \
-            ${{ secrets.DOCKERHUB_USERNAME }}/literate:${{ needs.build.output.tag }}
+            -p 8000:8000 -d \
+            ${{ secrets.DOCKERHUB_USERNAME }}/literate:${{ needs.build.outputs.tag }}
             
