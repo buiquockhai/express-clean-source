@@ -25,13 +25,12 @@ const getQuestionDetail = async ({ req }) => {
 };
 
 const getFolders = async ({ req, token }) => {
-  console.log("======================================================");
   const result = await model.Folder.findAll({
-    // where: {
-    //   deleted: "N",
-    //   // ...req?.params,
-    //   created_id: token.id,
-    // },
+    where: {
+      deleted: "N",
+      ...req?.params,
+      created_id: token.id,
+    },
   });
   return result;
 };
@@ -48,6 +47,13 @@ const newFolder = async ({ req }) => {
 const updateFolder = async ({ req }) => {
   const result = await model.Folder.update({
     ...req.body,
+  });
+  return result;
+};
+
+const newQuestion = async ({ req }) => {
+  const result = await model.Question.create({
+    id: uuid(),
   });
   return result;
 };
