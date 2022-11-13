@@ -1,24 +1,25 @@
-const { uuid } = require("uuidv4");
+const { v4 } = require("uuid");
 const model = require("../models");
 
 const getQuestions = async ({ req, token }) => {
   const result = await model.Question.findAll({
     logging: console.log,
-    include: [{ model: model.Folder, as: "folders" }],
+    // include: [{ model: model.Folder, as: "folders" }],
     where: {
-      deleted: "N",
       ...req?.params,
+      deleted: "N",
       created_id: token.id,
     },
   });
   return result;
 };
 
-const getQuestionDetail = async ({ req }) => {
+const getQuestionDetail = async ({ req, token }) => {
   const result = await model.Question.findOne({
     where: {
-      deleted: "N",
       ...req.params,
+      deleted: "N",
+      updated_id: token.id,
     },
   });
   return result;
@@ -26,34 +27,59 @@ const getQuestionDetail = async ({ req }) => {
 
 const getFolders = async ({ req, token }) => {
   const result = await model.Folder.findAll({
+    logging: console.log,
+    include: [{ model: model.Question, as: "questions" }],
     where: {
-      deleted: "N",
       ...req?.params,
+      deleted: "N",
       created_id: token.id,
     },
   });
   return result;
 };
 
-const newFolder = async ({ req }) => {
+const newFolder = async ({ req, token }) => {
   const { name } = req.body;
   const result = await model.Folder.create({
-    id: uuid(),
+    id: v4(),
     name: name,
+    created_id: token.id,
+    updated_id: token.id,
+    deleted: "N",
   });
   return result;
 };
 
-const updateFolder = async ({ req }) => {
+const newQuestion = async ({ req, token }) => {
+  const result = await model.Question.create({
+    id: v4(),
+    type: req.body.type,
+    level: req.body.level,
+    point: req.body.point,
+    title: req.body.title,
+    content: req.body.content,
+    images: req.body.images ?? null,
+    created_id: token.id,
+    updated_id: token.id,
+    deleted: "N",
+  });
+  return result;
+};
+
+const updateFolder = async ({ req, token }) => {
   const result = await model.Folder.update({
     ...req.body,
+    created_id: token.id,
+    updated_id: token.id,
   });
   return result;
 };
 
-const newQuestion = async ({ req }) => {
-  const result = await model.Question.create({
-    id: uuid(),
+const updateQuestion = async ({ req, token }) => {
+  const result = await model.Question.update({
+    ...req.body,
+    created_id: token.id,
+    updated_id: token.id,
   });
   return result;
 };
@@ -64,4 +90,6 @@ module.exports = {
   newFolder,
   getFolders,
   updateFolder,
+  newQuestion,
+  updateQuestion,
 };

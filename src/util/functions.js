@@ -37,7 +37,7 @@ const wrapper = (originalFunction, options) => {
       });
       return BaseResponse(response, dataResponse);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 };

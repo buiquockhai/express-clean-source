@@ -1,25 +1,20 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class Folder extends Model {
-    static className = "Folder";
+  class Configuration extends Model {
+    static className = "Configuration";
 
-    static associate(models) {
-      Folder.hasMany(models.Question, {
-        foreignKey: "folder_id",
-        as: "questions",
-      });
-    }
+    static associate(models) {}
   }
 
-  Folder.init(
+  Configuration.init(
     {
-      id: {
-        type: DataTypes.UUID,
+      key: {
+        type: DataTypes.STRING,
         primaryKey: true,
         allowNull: false,
       },
-      name: {
+      value: {
         type: DataTypes.STRING,
       },
       created_date: {
@@ -40,12 +35,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "tb_question_folder",
+      modelName: "tb_config",
       freezeTableName: true,
       createdAt: "created_date",
       updatedAt: "updated_date",
       timestamps: true,
     }
   );
-  return Folder;
+  return Configuration;
 };

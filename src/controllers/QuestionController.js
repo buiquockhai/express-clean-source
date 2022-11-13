@@ -6,6 +6,7 @@ const {
   getFolders,
   updateFolder,
   newQuestion,
+  updateQuestion,
 } = require("../services/QuestionService");
 const { wrapper } = require("../util/functions");
 
@@ -14,13 +15,14 @@ const { wrapper } = require("../util/functions");
  */
 
 router.post("/folder", wrapper(newFolder));
-router.post("/question", wrapper(newQuestion));
+router.post("/", wrapper(newQuestion));
 
 /*
  ** 2. Update endpoints
  */
 
 router.put("/folder", wrapper(updateFolder));
+router.put("/", wrapper(updateQuestion));
 
 /*
  ** 3. Get endpoints

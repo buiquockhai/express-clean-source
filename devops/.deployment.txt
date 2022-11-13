@@ -54,3 +54,6 @@ PG_PORT:
 
 PG_DATABASE:
 literate
+
+JITSI_LINK:
+jitsi: https://meet.distributed-systems.xyz

@@ -1,43 +1,26 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class Question extends Model {
-    static className = "Question";
+  class Notification extends Model {
+    static className = "Notification";
 
-    static associate(models) {
-      Question.belongsTo(models.Folder, {
-        foreignKey: "folder_id",
-        as: "questions",
-      });
-      Question.hasMany(models.Answer, {
-        foreignKey: "question_id",
-      });
-    }
+    static associate(models) {}
   }
 
-  Question.init(
+  Notification.init(
     {
       id: {
         type: DataTypes.UUID,
         primaryKey: true,
         allowNull: false,
       },
-      type: {
-        type: DataTypes.STRING,
-      },
-      level: {
-        type: DataTypes.STRING,
-      },
-      point: {
-        type: DataTypes.INTEGER,
+      user_id: {
+        type: DataTypes.UUID,
       },
       title: {
         type: DataTypes.STRING,
       },
       content: {
-        type: DataTypes.STRING,
-      },
-      images: {
         type: DataTypes.STRING,
       },
       created_date: {
@@ -58,12 +41,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "tb_question",
+      modelName: "tb_notification",
       freezeTableName: true,
       createdAt: "created_date",
       updatedAt: "updated_date",
       timestamps: true,
     }
   );
-  return Question;
+  return Notification;
 };
