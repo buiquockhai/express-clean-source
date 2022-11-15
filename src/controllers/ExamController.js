@@ -1,25 +1,29 @@
 const router = require("express").Router();
-const { getExams } = require("../services/ExamService");
+const {
+  getExams,
+  getExamDetail,
+  newExam,
+  updateExam,
+} = require("../services/ExamService");
 const { wrapper } = require("../util/functions");
 
 /*
  ** 1. Create endpoints
  */
 
-// router.post("/folder", wrapper(newFolder));
-// router.post("/", wrapper(newQuestion));
+router.post("/", wrapper(newExam));
 
 /*
  ** 2. Update endpoints
  */
 
-// router.put("/folder", wrapper(updateFolder));
-// router.put("/", wrapper(updateQuestion));
+router.put("/", wrapper(updateExam));
 
 /*
  ** 3. Get endpoints
  */
 
-// router.get("/", wrapper(getExams));
+router.get("/:id", wrapper(getExamDetail));
+router.get("/", wrapper(getExams));
 
 module.exports = router;

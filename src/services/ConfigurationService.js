@@ -5,7 +5,6 @@ const getConfigurations = async ({ req, token }) => {
     where: {
       ...req?.params,
       deleted: "N",
-      created_id: token.id,
     },
   });
   return result;
@@ -22,7 +21,22 @@ const newConfiguration = async ({ req, token }) => {
   return result;
 };
 
+const updateConfiguration = async ({ req, token }) => {
+  const { key, ...rest } = req.body;
+  const result = await model.Configuration.update(
+    {
+      ...rest,
+      updated_id: token.id,
+    },
+    {
+      where: { key },
+    }
+  );
+  return result;
+};
+
 module.exports = {
   getConfigurations,
   newConfiguration,
+  updateConfiguration,
 };

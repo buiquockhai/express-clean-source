@@ -1,11 +1,11 @@
 const { v4 } = require("uuid");
 const model = require("../models");
 
-const getNotifications = async ({ _, token }) => {
+const getNotifications = async ({ req, token }) => {
   const result = await model.Notification.findAll({
     where: {
+      ...req.params,
       deleted: "N",
-      user_id: token.id,
     },
   });
   return result;

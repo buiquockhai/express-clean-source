@@ -57,23 +57,34 @@ const getUsers = async ({ req }) => {
 };
 
 const updateUser = async ({ req, token }) => {
-  const result = await model.User.update({
-    ...req.body,
-    updated_id: token.id,
-  });
+  const { id, ...rest } = req.body;
+  const result = await model.User.update(
+    {
+      ...rest,
+      updated_id: token.id,
+    },
+    {
+      where: { id },
+    }
+  );
   return result;
 };
 
 const changePassword = async ({ req, token }) => {
-  const result = await model.User.update({
-    password: req.body.password,
-    updated_id: token.id,
-  });
+  const result = await model.User.update(
+    {
+      password: req.body.password,
+      updated_id: token.id,
+    },
+    {
+      where: { id: req.body.id },
+    }
+  );
   return result;
 };
 
 const newUser = async ({ req, token }) => {
-  const result = await model.User.update({
+  const result = await model.User.create({
     id: v4(),
     role: req.body.role,
     name: req.body.name,
