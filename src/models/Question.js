@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Question.belongsTo(models.Folder, {
         foreignKey: "folder_id",
-        as: "questions",
       });
       Question.hasMany(models.Answer, {
         foreignKey: "question_id",
@@ -39,6 +38,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       images: {
         type: DataTypes.STRING,
+      },
+      folder_id: {
+        type: DataTypes.UUID,
       },
       created_date: {
         type: DataTypes.DATE,

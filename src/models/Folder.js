@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Folder.hasMany(models.Question, {
         foreignKey: "folder_id",
-        as: "questions",
       });
     }
   }

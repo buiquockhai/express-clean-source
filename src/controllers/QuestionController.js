@@ -2,11 +2,12 @@ const router = require("express").Router();
 const {
   getQuestions,
   getQuestionDetail,
-  newFolder,
   getFolders,
-  updateFolder,
+  getTree,
+  newFolder,
   newQuestion,
   updateQuestion,
+  updateFolder,
 } = require("../services/QuestionService");
 const { wrapper } = require("../util/functions");
 
@@ -29,6 +30,7 @@ router.put("/", wrapper(updateQuestion));
  */
 
 router.get("/folder", wrapper(getFolders));
+router.get("/tree", wrapper(getTree));
 router.get("/:id", wrapper(getQuestionDetail));
 router.get("/", wrapper(getQuestions));
 

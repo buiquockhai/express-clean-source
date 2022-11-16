@@ -4,8 +4,8 @@ const model = require("../models");
 
 const getQuestions = async ({ req }) => {
   const result = await model.Question.findAll({
-    logging: console.log,
-    // include: [{ model: model.Folder, as: "folders" }],
+    // logging: console.log,
+    include: [{ model: model.Folder }, { model: model.Answer }],
     where: {
       ...req?.params,
       deleted: "N",
@@ -16,6 +16,7 @@ const getQuestions = async ({ req }) => {
 
 const getQuestionDetail = async ({ req }) => {
   const result = await model.Question.findOne({
+    include: [{ model: model.Folder }, { model: model.Answer }],
     where: {
       ...req.params,
       deleted: "N",
@@ -26,14 +27,31 @@ const getQuestionDetail = async ({ req }) => {
 
 const getFolders = async ({ req }) => {
   const result = await model.Folder.findAll({
-    logging: console.log,
-    include: [{ model: model.Question, as: "questions" }],
+    include: [{ model: model.Question }],
     where: {
       ...req?.params,
       deleted: "N",
     },
   });
   return result;
+};
+
+const getTree = async ({ _, token }) => {
+  const parents = await model.Folder.findAll({
+    include: [{ model: model.Question }],
+    where: {
+      created_id: token.id,
+      deleted: "N",
+    },
+  });
+  const aloneLeafs = await model.Question.findAll({
+    where: {
+      folder_id: null,
+      created_id: token.id,
+      deleted: "N",
+    },
+  });
+  return { parents, aloneLeafs };
 };
 
 const newFolder = async ({ req, token }) => {
@@ -95,6 +113,7 @@ const updateQuestion = async ({ req, token }) => {
 module.exports = {
   getQuestions,
   getQuestionDetail,
+  getTree,
   newFolder,
   getFolders,
   updateFolder,

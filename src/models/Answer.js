@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Answer.belongsTo(models.Question, {
         foreignKey: "question_id",
-        as: "question",
       });
     }
   }
@@ -39,6 +38,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       updated_id: {
         type: DataTypes.UUID,
+      },
+      deleted: {
+        type: DataTypes.STRING,
       },
     },
     {
