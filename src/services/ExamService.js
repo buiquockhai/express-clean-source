@@ -1,4 +1,5 @@
 const { v4 } = require("uuid");
+const { Op } = require("sequelize");
 const model = require("../models");
 
 const getExams = async ({ req }) => {
@@ -44,7 +45,7 @@ const updateExam = async ({ req, token }) => {
       updated_id: token.id,
     },
     {
-      where: { id },
+      where: { id: { [Op.in]: [id].flat() } },
     }
   );
   return result;

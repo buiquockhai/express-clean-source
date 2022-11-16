@@ -1,5 +1,6 @@
 const model = require("../models");
 const jwt = require("jsonwebtoken");
+const { Op } = require("sequelize");
 const { v4 } = require("uuid");
 const { JWT_PRIVATE_KEY } = require("../util/constraints");
 
@@ -64,7 +65,7 @@ const updateUser = async ({ req, token }) => {
       updated_id: token.id,
     },
     {
-      where: { id },
+      where: { id: { [Op.in]: [id].flat() } },
     }
   );
   return result;

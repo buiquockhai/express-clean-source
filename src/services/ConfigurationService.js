@@ -1,6 +1,7 @@
 const model = require("../models");
+const { Op } = require("sequelize");
 
-const getConfigurations = async ({ req, token }) => {
+const getConfigurations = async ({ req }) => {
   const result = await model.Configuration.findAll({
     where: {
       ...req?.params,
@@ -29,7 +30,7 @@ const updateConfiguration = async ({ req, token }) => {
       updated_id: token.id,
     },
     {
-      where: { key },
+      where: { key: { [Op.in]: [key].flat() } },
     }
   );
   return result;
