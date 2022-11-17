@@ -65,6 +65,9 @@ module.exports = (sequelize, DataTypes) => {
       updated_id: {
         type: DataTypes.UUID,
       },
+      deleted: {
+        type: DataTypes.STRING,
+      },
     },
     {
       sequelize,
