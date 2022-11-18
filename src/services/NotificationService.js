@@ -4,7 +4,7 @@ const model = require("../models");
 const getNotifications = async ({ req, token }) => {
   const result = await model.Notification.findAll({
     where: {
-      ...req.params,
+      ...req.query,
       deleted: "N",
     },
   });

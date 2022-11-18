@@ -5,7 +5,7 @@ const model = require("../models");
 const getGroups = async ({ req }) => {
   const result = await model.Group.findAll({
     where: {
-      ...req?.params,
+      ...req?.query,
       deleted: "N",
     },
   });

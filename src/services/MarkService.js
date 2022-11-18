@@ -4,7 +4,7 @@ const model = require("../models");
 const getMarks = async ({ req }) => {
   const result = await model.Mark.findAll({
     where: {
-      ...req?.params,
+      ...req?.query,
       deleted: "N",
     },
   });

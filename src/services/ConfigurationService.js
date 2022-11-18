@@ -4,7 +4,7 @@ const { Op } = require("sequelize");
 const getConfigurations = async ({ req }) => {
   const result = await model.Configuration.findAll({
     where: {
-      ...req?.params,
+      ...req?.query,
       deleted: "N",
     },
   });

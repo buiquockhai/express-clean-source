@@ -4,7 +4,7 @@ const model = require("../models");
 const getViolatingRules = async ({ req }) => {
   const result = await model.ViolatingRule.findAll({
     where: {
-      ...req?.params,
+      ...req?.query,
       deleted: "N",
     },
   });

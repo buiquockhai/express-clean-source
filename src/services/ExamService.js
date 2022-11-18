@@ -5,7 +5,7 @@ const model = require("../models");
 const getExams = async ({ req }) => {
   const result = await model.Exam.findAll({
     where: {
-      ...req?.params,
+      ...req?.query,
       deleted: "N",
     },
   });

@@ -5,7 +5,7 @@ const model = require("../models");
 const getRooms = async ({ req }) => {
   const result = await model.Room.findAll({
     where: {
-      ...req?.params,
+      ...req?.query,
       deleted: "N",
     },
   });

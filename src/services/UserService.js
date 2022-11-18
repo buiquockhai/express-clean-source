@@ -50,7 +50,7 @@ const getForceUserDetail = async ({ req }) => {
 const getUsers = async ({ req }) => {
   const result = await model.User.findAll({
     where: {
-      ...req?.params,
+      ...req?.query,
       deleted: "N",
     },
   });
@@ -72,16 +72,24 @@ const updateUser = async ({ req, token }) => {
 };
 
 const changePassword = async ({ req, token }) => {
-  const result = await model.User.update(
-    {
-      password: req.body.password,
-      updated_id: token.id,
+  const user = await model.User.findOne({
+    where: {
+      id: token.id,
     },
-    {
-      where: { id: req.body.id },
-    }
-  );
-  return result;
+  });
+  if (user.password === req.old_password) {
+    const result = await model.User.update(
+      {
+        password: req.body.new_password,
+        updated_id: token.id,
+      },
+      {
+        where: { id: token.id },
+      }
+    );
+    return result;
+  }
+  return false;
 };
 
 const newUser = async ({ req, token }) => {

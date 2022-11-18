@@ -7,7 +7,7 @@ const getQuestions = async ({ req }) => {
     // logging: console.log,
     include: [{ model: model.Folder }, { model: model.Answer }],
     where: {
-      ...req?.params,
+      ...req?.query,
       deleted: "N",
     },
   });
@@ -29,7 +29,7 @@ const getFolders = async ({ req }) => {
   const result = await model.Folder.findAll({
     include: [{ model: model.Question }],
     where: {
-      ...req?.params,
+      ...req?.query,
       deleted: "N",
     },
   });
