@@ -67,8 +67,9 @@ const newFolder = async ({ req, token }) => {
 };
 
 const newQuestion = async ({ req, token }) => {
-  const result = await model.Question.create({
-    id: v4(),
+  const generateId = v4();
+  const question = await model.Question.create({
+    id: generateId,
     type: req.body.type,
     level: req.body.level,
     point: req.body.point,
@@ -79,7 +80,21 @@ const newQuestion = async ({ req, token }) => {
     updated_id: token.id,
     deleted: "N",
   });
-  return result;
+  if (question) {
+    (req.body.answer ?? []).forEach(async (item) => {
+      await model.Answer.create({
+        id: v4(),
+        content: item.content,
+        question_id: generateId,
+        percent: item.percent,
+        created_id: token.id,
+        updated_id: token.id,
+        deleted: "N",
+      });
+    });
+  }
+
+  return question;
 };
 
 const updateFolder = async ({ req, token }) => {
