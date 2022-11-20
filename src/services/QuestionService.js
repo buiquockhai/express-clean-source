@@ -112,7 +112,7 @@ const updateFolder = async ({ req, token }) => {
 };
 
 const updateQuestion = async ({ req, token }) => {
-  const { id, ...rest } = req.body;
+  const { id, answer, ...rest } = req.body;
   const result = await model.Question.update(
     {
       ...rest,
@@ -122,6 +122,29 @@ const updateQuestion = async ({ req, token }) => {
       where: { id: { [Op.in]: [id].flat() } },
     }
   );
+
+  if (Array.isArray(answer) && answer.length > 0) {
+    await model.Answer.update(
+      {
+        updated_id: token.id,
+        deleted: "Y",
+      },
+      { where: { question_id: id } }
+    ).then(() => {
+      answer.forEach(async (item) => {
+        await model.Answer.create({
+          id: v4(),
+          content: item.content,
+          question_id: id,
+          percent: item.percent,
+          created_id: token.id,
+          updated_id: token.id,
+          deleted: "N",
+        });
+      });
+    });
+  }
+
   return result;
 };
 
