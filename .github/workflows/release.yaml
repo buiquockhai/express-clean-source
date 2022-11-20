@@ -57,6 +57,10 @@ jobs:
             export LITERATE_RUNNER=$(docker ps --filter=name=literate --format={{.Names}})
             [[ ! -z $LITERATE_RUNNER ]] && docker rm -f literate
             docker run --name literate \
+            --log-driver=loki \
+            --log-opt loki-url="https://${{ secrets.LOKI_USERNAME }}:${{ secrets.LOKI_PASSWORD }}@logs-prod-011.grafana.net/loki/api/v1/push" \
+            --log-opt loki-retries=5 \
+            --log-opt loki-batch-size=400 \
             --env PG_USERNAME=${{ secrets.PG_USERNAME }} \
             --env PG_PASSWORD=${{ secrets.PG_PASSWORD }} \
             --env PG_HOST=${{ secrets.PG_HOST }} \
