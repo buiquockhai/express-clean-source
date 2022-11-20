@@ -3,13 +3,19 @@ const { Op } = require("sequelize");
 const model = require("../models");
 
 const getQuestions = async ({ req }) => {
+  const { id, ...rest } = req.query;
   const result = await model.Question.findAll({
-    // logging: console.log,
     include: [{ model: model.Folder }, { model: model.Answer }],
-    where: {
-      ...req?.query,
-      deleted: "N",
-    },
+    where: id
+      ? {
+          ...rest,
+          id: { [Op.in]: [id].flat() },
+          deleted: "N",
+        }
+      : {
+          ...rest,
+          deleted: "N",
+        },
   });
   return result;
 };
