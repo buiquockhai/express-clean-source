@@ -75,6 +75,7 @@ const newQuestion = async ({ req, token }) => {
     point: req.body.point,
     title: req.body.title,
     content: req.body.content,
+    folder_id: req.body.folder_id,
     images: req.body.images ?? null,
     created_id: token.id,
     updated_id: token.id,
