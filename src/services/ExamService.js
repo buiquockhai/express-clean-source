@@ -40,8 +40,9 @@ const getExamDetail = async ({ req }) => {
 };
 
 const newExam = async ({ req, token }) => {
+  const newId = v4();
   const result = await model.Exam.create({
-    id: v4(),
+    id: newId,
     max_point: req.body.max_point,
     duration: req.body.duration,
     level: req.body.level,
@@ -50,12 +51,23 @@ const newExam = async ({ req, token }) => {
     created_id: token.id,
     updated_id: token.id,
     deleted: "N",
+  }).then(() => {
+    (req.body.questions ?? []).forEach(async (item) => {
+      await model.ExamQuestion.create({
+        id: v4(),
+        question_id: item,
+        exam_id: newId,
+        created_id: token.id,
+        updated_id: token.id,
+        deleted: "N",
+      });
+    });
   });
   return result;
 };
 
 const updateExam = async ({ req, token }) => {
-  const { id, ...rest } = req.body;
+  const { id, questions, ...rest } = req.body;
   const result = await model.Exam.update(
     {
       ...rest,
@@ -65,6 +77,28 @@ const updateExam = async ({ req, token }) => {
       where: { id: { [Op.in]: [id].flat() } },
     }
   );
+
+  if (Array.isArray(questions) && questions.length > 0) {
+    await model.ExamQuestion.update(
+      {
+        updated_id: token.id,
+        deleted: "Y",
+      },
+      { where: { question_id: id } }
+    ).then(() => {
+      questions.forEach(async (item) => {
+        await model.ExamQuestion.create({
+          id: v4(),
+          question_id: item,
+          exam_id: id,
+          created_id: token.id,
+          updated_id: token.id,
+          deleted: "N",
+        });
+      });
+    });
+  }
+
   return result;
 };
 
