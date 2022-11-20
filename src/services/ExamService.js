@@ -13,13 +13,30 @@ const getExams = async ({ req }) => {
 };
 
 const getExamDetail = async ({ req }) => {
-  const result = await model.Exam.findOne({
+  const questionBelongToExam = await model.ExamQuestion.findAll({
+    where: {
+      exam_id: req.params.id,
+      deleted: "N",
+    },
+  });
+
+  const questionIds = questionBelongToExam.map((item) => item.question_id);
+
+  const questionList = await model.Question.findAll({
+    include: [{ model: model.Folder }, { model: model.Answer }],
+    where: {
+      id: { [Op.in]: questionIds },
+      deleted: "N",
+    },
+  });
+
+  const exam = await model.Exam.findOne({
     where: {
       id: req.params.id,
       deleted: "N",
     },
   });
-  return result;
+  return { exam, questionList };
 };
 
 const newExam = async ({ req, token }) => {
