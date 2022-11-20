@@ -33,7 +33,6 @@ const newRoom = async ({ req, token }) => {
     proctor_id: req.body.proctor_id,
     proctor_name: req.body.proctor_name,
     start_date: req.body.start_date,
-    meeting: req.body.meeting,
     created_id: token.id,
     updated_id: token.id,
     deleted: "N",

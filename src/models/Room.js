@@ -38,9 +38,6 @@ module.exports = (sequelize, DataTypes) => {
       start_date: {
         type: DataTypes.DATE,
       },
-      meeting: {
-        type: DataTypes.STRING,
-      },
       created_date: {
         type: DataTypes.DATE,
       },

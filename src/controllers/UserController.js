@@ -7,6 +7,7 @@ const {
   updateUser,
   newUser,
   changePassword,
+  getFreezeUsers,
 } = require("../services/UserService");
 const { wrapper } = require("../util/functions");
 
@@ -28,6 +29,7 @@ router.put("/", wrapper(updateUser));
  */
 
 router.get("/detail", wrapper(getUserDetail));
+router.get("/freeze", wrapper(getFreezeUsers));
 router.get("/force-detail/:id", wrapper(getForceUserDetail));
 router.get("/", wrapper(getUsers));
 

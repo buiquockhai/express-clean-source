@@ -9,14 +9,17 @@ module.exports = (sequelize, DataTypes) => {
 
   ExamQuestion.init(
     {
-      question_id: {
+      id: {
         type: DataTypes.UUID,
         primaryKey: true,
         allowNull: false,
       },
+      question_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
       exam_id: {
         type: DataTypes.UUID,
-        primaryKey: true,
         allowNull: false,
       },
       created_date: {
@@ -44,5 +47,6 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
     }
   );
+
   return ExamQuestion;
 };

@@ -57,6 +57,16 @@ const getUsers = async ({ req }) => {
   return result;
 };
 
+const getFreezeUsers = async () => {
+  const result = await model.User.findAll({
+    where: {
+      group_id: { [Op.eq]: null },
+      deleted: "N",
+    },
+  });
+  return result;
+};
+
 const updateUser = async ({ req, token }) => {
   const { id, ...rest } = req.body;
   const result = await model.User.update(
@@ -121,4 +131,5 @@ module.exports = {
   updateUser,
   newUser,
   changePassword,
+  getFreezeUsers,
 };

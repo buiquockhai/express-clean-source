@@ -137,17 +137,17 @@ const updateQuestion = async ({ req, token }) => {
         deleted: "Y",
       },
       { where: { question_id: id } }
-    ).then(() => {
-      answer.forEach(async (item) => {
-        await model.Answer.create({
-          id: v4(),
-          content: item.content,
-          question_id: id,
-          percent: item.percent,
-          created_id: token.id,
-          updated_id: token.id,
-          deleted: "N",
-        });
+    );
+
+    answer.forEach(async (item) => {
+      await model.Answer.create({
+        id: v4(),
+        content: item.content,
+        question_id: id,
+        percent: item.percent,
+        created_id: token.id,
+        updated_id: token.id,
+        deleted: "N",
       });
     });
   }

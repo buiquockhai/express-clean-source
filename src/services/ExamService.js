@@ -51,7 +51,9 @@ const newExam = async ({ req, token }) => {
     created_id: token.id,
     updated_id: token.id,
     deleted: "N",
-  }).then(() => {
+  });
+
+  if (result) {
     (req.body.questions ?? []).forEach(async (item) => {
       await model.ExamQuestion.create({
         id: v4(),
@@ -62,7 +64,8 @@ const newExam = async ({ req, token }) => {
         deleted: "N",
       });
     });
-  });
+  }
+
   return result;
 };
 
@@ -85,16 +88,16 @@ const updateExam = async ({ req, token }) => {
         deleted: "Y",
       },
       { where: { question_id: id } }
-    ).then(() => {
-      questions.forEach(async (item) => {
-        await model.ExamQuestion.create({
-          id: v4(),
-          question_id: item,
-          exam_id: id,
-          created_id: token.id,
-          updated_id: token.id,
-          deleted: "N",
-        });
+    );
+
+    questions.forEach(async (item) => {
+      await model.ExamQuestion.create({
+        id: v4(),
+        question_id: item,
+        exam_id: id,
+        created_id: token.id,
+        updated_id: token.id,
+        deleted: "N",
       });
     });
   }

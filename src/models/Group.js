@@ -4,7 +4,11 @@ module.exports = (sequelize, DataTypes) => {
   class Group extends Model {
     static className = "Group";
 
-    static associate(models) {}
+    static associate(models) {
+      Group.hasMany(models.User, {
+        foreignKey: "group_id",
+      });
+    }
   }
 
   Group.init(
