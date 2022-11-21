@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
       status: {
         type: DataTypes.STRING,
       },
+      submitted: {
+        type: DataTypes.STRING,
+      },
       title: {
         type: DataTypes.STRING,
       },
