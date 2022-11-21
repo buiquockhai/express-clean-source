@@ -4,6 +4,13 @@ const model = require("../models");
 
 const getResults = async ({ req }) => {
   const result = await model.Result.findAll({
+    include: [
+      {
+        model: model.Question,
+        include: [{ model: model.Answer }],
+      },
+      { model: model.User },
+    ],
     where: {
       ...req?.query,
       deleted: "N",
@@ -14,6 +21,10 @@ const getResults = async ({ req }) => {
 
 const getResultDetail = async ({ req }) => {
   const result = await model.Result.findOne({
+    include: [
+      { model: model.Question, include: [{ model: model.Answer }] },
+      { model: model.User },
+    ],
     where: {
       id: req.params.id,
       deleted: "N",

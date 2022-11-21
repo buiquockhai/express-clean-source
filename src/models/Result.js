@@ -4,7 +4,15 @@ module.exports = (sequelize, DataTypes) => {
   class Result extends Model {
     static className = "Result";
 
-    static associate(models) {}
+    static associate(models) {
+      Result.belongsTo(models.User, {
+        foreignKey: "created_id",
+      });
+
+      Result.belongsTo(models.Question, {
+        foreignKey: "question_id",
+      });
+    }
   }
 
   Result.init(
@@ -20,14 +28,11 @@ module.exports = (sequelize, DataTypes) => {
       selected_answer_id: {
         type: DataTypes.UUID,
       },
-      answer_content: {
-        type: DataTypes.STRING,
-      },
-      answer_images: {
-        type: DataTypes.STRING,
-      },
       question_id: {
         type: DataTypes.UUID,
+      },
+      selected_answer_label: {
+        type: DataTypes.STRING,
       },
       created_date: {
         type: DataTypes.DATE,

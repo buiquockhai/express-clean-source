@@ -8,7 +8,12 @@ module.exports = (sequelize, DataTypes) => {
       Question.belongsTo(models.Folder, {
         foreignKey: "folder_id",
       });
+
       Question.hasMany(models.Answer, {
+        foreignKey: "question_id",
+      });
+
+      Question.hasMany(models.Result, {
         foreignKey: "question_id",
       });
     }
