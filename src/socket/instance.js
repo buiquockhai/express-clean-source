@@ -24,14 +24,3 @@ const socketInstance = new SocketIO();
 module.exports = {
   socketInstance,
 };
-
-// let _io;
-
-// const setIO = (server) => socket(server);
-
-// const getIO = () => _io;
-
-// module.exports = {
-//   setIO,
-//   getIO,
-// };
