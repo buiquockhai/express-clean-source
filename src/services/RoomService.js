@@ -61,7 +61,7 @@ const updateRoom = async ({ req, token }) => {
 const verifyTeacherJoinRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
-      proctor_id: token.id,
+      id: req.body.id,
     },
   });
 
@@ -77,11 +77,20 @@ const verifyTeacherJoinRoom = async ({ req, token }) => {
       }
     );
 
-    socketInstance.getIO().emit(SocketListener.internalCreateRoom, persist?.id);
-
-    return true;
+    return persist;
   }
+
   return false;
+};
+
+const verifyStudentJoinRoom = async ({ req }) => {
+  const persist = await model.Room.findOne({
+    where: {
+      id: req.body.id,
+    },
+  });
+
+  return persist?.group_id === req.body.group_id ? persist : false;
 };
 
 module.exports = {
@@ -89,4 +98,6 @@ module.exports = {
   getRoomDetail,
   newRoom,
   updateRoom,
+  verifyTeacherJoinRoom,
+  verifyStudentJoinRoom,
 };

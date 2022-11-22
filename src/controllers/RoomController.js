@@ -4,6 +4,8 @@ const {
   getRoomDetail,
   newRoom,
   updateRoom,
+  verifyTeacherJoinRoom,
+  verifyStudentJoinRoom,
 } = require("../services/RoomService");
 const { wrapper } = require("../util/functions");
 
@@ -11,6 +13,8 @@ const { wrapper } = require("../util/functions");
  ** 1. Create endpoints
  */
 
+router.post("/teacher-join", wrapper(verifyTeacherJoinRoom));
+router.post("/student-join", wrapper(verifyStudentJoinRoom));
 router.post("/", wrapper(newRoom));
 
 /*

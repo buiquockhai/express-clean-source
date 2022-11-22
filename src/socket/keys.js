@@ -1,18 +1,17 @@
 const SocketListener = {
   connection: "connection",
-  internalCreateRoom: "internal-create-room",
-
   clientSendSubmitExam: "client-send-submit-exam",
   clientSendRejectExam: "client-send-reject-exam",
+  clientSendCreateRoom: "client-send-create-room",
+  clientSendJoinRoom: "client-send-join-room",
+  clientAcceptJoinRoom: "client-accept-join-room",
 };
 
 const SocketEmitter = {
-  // server internal
-  internalCreateRoom: "internal-create-room",
-
-  // client effect
   serverFeedbackSubmitExam: "server-feedback-submit-exam",
   serverFeedbackRejectExam: "server-feedback-reject-exam",
+  serverFeedbackJoinRoom: "server-feedback-join-room",
+  serverFeedbackAcceptJoinRoom: "server-feedback-accept-join-room",
 };
 
 const SocketRoom = {

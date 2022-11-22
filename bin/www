@@ -18,9 +18,9 @@ socketInstance.setIO(server);
 let io = socketInstance.getIO();
 
 io.on(SocketListener.connection, (socket) => {
-  socket.on(SocketListener.internalCreateRoom, (data) => {
-    console.log("** joined new room **");
-    socket.join(data);
+  socket.on(SocketListener.clientSendCreateRoom, (roomId) => {
+    console.log("** joined new room **", roomId);
+    socket.join(roomId);
   });
 
   socket.on(SocketListener.clientSendSubmitExam, (data) => {
@@ -35,6 +35,20 @@ io.on(SocketListener.connection, (socket) => {
       target: data.target,
       message: "Đề thi bị quản trị viên từ chối",
       description: data.examTitle,
+    });
+  });
+
+  socket.on(SocketListener.clientSendJoinRoom, (data) => {
+    socket.join(data?.roomId);
+    socket.to(data?.roomId).emit(SocketEmitter.serverFeedbackJoinRoom, {
+      studentId: data.studentId,
+    });
+  });
+
+  socket.on(SocketListener.clientAcceptJoinRoom, (data) => {
+    socket.to(data?.roomId).emit(SocketEmitter.serverFeedbackAcceptJoinRoom, {
+      roomId: data.roomId,
+      userId: data.userId,
     });
   });
 });
