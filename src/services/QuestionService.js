@@ -6,6 +6,7 @@ const getQuestions = async ({ req }) => {
   const { id, ...rest } = req.query;
   const result = await model.Question.findAll({
     include: [{ model: model.Folder }, { model: model.Answer }],
+    order: [["created_date", "DESC"]],
     where: id
       ? {
           ...rest,
@@ -34,6 +35,7 @@ const getQuestionDetail = async ({ req }) => {
 const getFolders = async ({ req }) => {
   const result = await model.Folder.findAll({
     include: [{ model: model.Question }],
+    order: [["created_date", "DESC"]],
     where: {
       ...req?.query,
       deleted: "N",

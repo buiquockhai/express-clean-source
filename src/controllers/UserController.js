@@ -28,9 +28,8 @@ router.put("/", wrapper(updateUser));
  ** 3. Get endpoints
  */
 
-router.get("/detail", wrapper(getUserDetail));
 router.get("/freeze", wrapper(getFreezeUsers));
-router.get("/force-detail/:id", wrapper(getForceUserDetail));
+router.get("/:id", wrapper(getUserDetail));
 router.get("/", wrapper(getUsers));
 
 module.exports = router;

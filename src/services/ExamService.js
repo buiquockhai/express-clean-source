@@ -8,6 +8,7 @@ const getExams = async ({ req }) => {
       ...req?.query,
       deleted: "N",
     },
+    order: [["created_date", "DESC"]],
   });
   return result;
 };

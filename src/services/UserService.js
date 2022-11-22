@@ -30,14 +30,7 @@ const getToken = async ({ req }) => {
   return null;
 };
 
-const getUserDetail = async ({ _, token }) => {
-  const result = await model.User.findOne({
-    where: { id: token.id, deleted: "N" },
-  });
-  return result;
-};
-
-const getForceUserDetail = async ({ req }) => {
+const getUserDetail = async ({ req }) => {
   const result = await model.User.findOne({
     where: {
       id: req.params.id,
@@ -49,6 +42,7 @@ const getForceUserDetail = async ({ req }) => {
 
 const getUsers = async ({ req }) => {
   const result = await model.User.findAll({
+    order: [["created_date", "DESC"]],
     where: {
       ...req?.query,
       deleted: "N",
@@ -59,7 +53,9 @@ const getUsers = async ({ req }) => {
 
 const getFreezeUsers = async () => {
   const result = await model.User.findAll({
+    order: [["created_date", "DESC"]],
     where: {
+      role: "student",
       group_id: { [Op.eq]: null },
       deleted: "N",
     },
@@ -127,7 +123,6 @@ module.exports = {
   getToken,
   getUsers,
   getUserDetail,
-  getForceUserDetail,
   updateUser,
   newUser,
   changePassword,

@@ -2,11 +2,37 @@ const debug = require("debug")("literate-server:server");
 const http = require("http");
 const app = require("../src/app");
 const db = require("../src/models");
+const {
+  SocketListener,
+  SocketRoom,
+  SocketEmitter,
+} = require("../src/socket/keys");
+const { socketInstance } = require("../src/socket/instance");
 const { PORT, HOST } = require("../src/util/constraints");
 
 app.set("port", PORT);
 
 const server = http.createServer(app);
+
+socketInstance.setIO(server);
+let io = socketInstance.getIO();
+
+io.on(SocketListener.connection, (socket) => {
+  socket.on(SocketListener.clientSendSubmitExam, (data) => {
+    socket.broadcast.emit(SocketEmitter.serverFeedbackSubmitExam, {
+      message: "Giảng viên submit đề thi",
+      description: data.examTitle,
+    });
+  });
+
+  socket.on(SocketListener.clientSendRejectExam, (data) => {
+    socket.broadcast.emit(SocketEmitter.serverFeedbackRejectExam, {
+      target: data.target,
+      message: "Đề thi bị quản trị viên từ chối",
+      description: data.examTitle,
+    });
+  });
+});
 
 const onError = (error) => {
   if (error.syscall !== "listen") throw error;
