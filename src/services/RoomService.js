@@ -1,6 +1,8 @@
 const { v4 } = require("uuid");
 const { Op } = require("sequelize");
 const model = require("../models");
+const { socketInstance } = require("../socket/instance");
+const { SocketListener } = require("../socket/keys");
 
 const getRooms = async ({ req }) => {
   const result = await model.Room.findAll({
@@ -54,6 +56,32 @@ const updateRoom = async ({ req, token }) => {
     }
   );
   return result;
+};
+
+const verifyTeacherJoinRoom = async ({ req, token }) => {
+  const persist = await model.Room.findOne({
+    where: {
+      proctor_id: token.id,
+    },
+  });
+
+  if (persist?.proctor_id === token.id) {
+    await model.Room.update(
+      {
+        status: "1",
+      },
+      {
+        where: {
+          id: persist?.id,
+        },
+      }
+    );
+
+    socketInstance.getIO().emit(SocketListener.internalCreateRoom, persist?.id);
+
+    return true;
+  }
+  return false;
 };
 
 module.exports = {

@@ -18,6 +18,11 @@ socketInstance.setIO(server);
 let io = socketInstance.getIO();
 
 io.on(SocketListener.connection, (socket) => {
+  socket.on(SocketListener.internalCreateRoom, (data) => {
+    console.log("** joined new room **");
+    socket.join(data);
+  });
+
   socket.on(SocketListener.clientSendSubmitExam, (data) => {
     socket.broadcast.emit(SocketEmitter.serverFeedbackSubmitExam, {
       message: "Giảng viên submit đề thi",
