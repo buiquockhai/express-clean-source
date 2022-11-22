@@ -7,6 +7,7 @@ const getNotifications = async ({ req, token }) => {
       ...req.query,
       deleted: "N",
     },
+    order: [["created_date", "DESC"]],
   });
   return result;
 };

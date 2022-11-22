@@ -17,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
       title: {
         type: DataTypes.STRING,
       },
+      status: {
+        type: DataTypes.STRING,
+      },
       exam_id: {
         type: DataTypes.UUID,
       },

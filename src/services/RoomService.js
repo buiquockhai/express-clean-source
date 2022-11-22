@@ -4,6 +4,7 @@ const model = require("../models");
 
 const getRooms = async ({ req }) => {
   const result = await model.Room.findAll({
+    order: [["created_date", "DESC"]],
     where: {
       ...req?.query,
       deleted: "N",
@@ -25,6 +26,7 @@ const getRoomDetail = async ({ req }) => {
 const newRoom = async ({ req, token }) => {
   const result = await model.Room.create({
     id: v4(),
+    status: req.body.status,
     title: req.body.title,
     exam_id: req.body.exam_id,
     exam_title: req.body.exam_title,
