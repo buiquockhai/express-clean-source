@@ -1,5 +1,8 @@
 const { Op } = require("sequelize");
+const { v4 } = require("uuid");
 const model = require("../models");
+const { socketInstance } = require("../socket/instance");
+const { SocketEmitter } = require("../socket/keys");
 
 const getViolatingRules = async ({ req }) => {
   const result = await model.ViolatingRule.findAll({
@@ -23,6 +26,7 @@ const getViolatingRuleDetail = async ({ req }) => {
 
 const newViolatingRule = async ({ req, token }) => {
   const result = await model.ViolatingRule.create({
+    id: v4(),
     user_id: req.body.user_id,
     room_id: req.body.room_id,
     minus_point: req.body.minus_point,
@@ -30,6 +34,12 @@ const newViolatingRule = async ({ req, token }) => {
     updated_id: token.id,
     deleted: "N",
   });
+
+  socketInstance.getIO().emit(SocketEmitter.serverFeedbackPenalty, {
+    studentId: req.body.user_id,
+    roomId: req.body.room_id,
+  });
+
   return result;
 };
 

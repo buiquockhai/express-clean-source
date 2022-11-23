@@ -10,6 +10,7 @@ const {
   teacherRejectRequestJoinRoom,
   studentCancelRequestJoinRoom,
   studentForceLeaveRoom,
+  pointingRoom,
 } = require("../services/RoomService");
 const { wrapper } = require("../util/functions");
 
@@ -17,6 +18,7 @@ const { wrapper } = require("../util/functions");
  ** 1. Create endpoints
  */
 
+router.post("/pointing-room", wrapper(pointingRoom));
 router.post("/force-leave", wrapper(studentForceLeaveRoom));
 router.post("/teacher-accept-request", wrapper(teacherAcceptRequestJoinRoom));
 router.post("/teacher-reject-request", wrapper(teacherRejectRequestJoinRoom));

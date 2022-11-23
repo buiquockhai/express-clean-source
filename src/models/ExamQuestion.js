@@ -4,7 +4,11 @@ module.exports = (sequelize, DataTypes) => {
   class ExamQuestion extends Model {
     static className = "ExamQuestion";
 
-    static associate(models) {}
+    static associate(models) {
+      ExamQuestion.belongsTo(models.Question, {
+        foreignKey: "question_id",
+      });
+    }
   }
 
   ExamQuestion.init(

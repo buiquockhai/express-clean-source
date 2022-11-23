@@ -9,13 +9,15 @@ module.exports = (sequelize, DataTypes) => {
 
   Mark.init(
     {
-      user_id: {
+      id: {
         type: DataTypes.UUID,
         primaryKey: true,
       },
+      user_id: {
+        type: DataTypes.UUID,
+      },
       room_id: {
         type: DataTypes.UUID,
-        primaryKey: true,
       },
       mark: {
         type: DataTypes.INTEGER,

@@ -33,6 +33,7 @@ const newRoom = async ({ req, token }) => {
     exam_id: req.body.exam_id,
     exam_title: req.body.exam_title,
     group_id: req.body.group_id,
+    marked: "N",
     group_title: req.body.group_title,
     proctor_id: req.body.proctor_id,
     proctor_name: req.body.proctor_name,
@@ -272,6 +273,78 @@ const studentForceLeaveRoom = async ({ req, token }) => {
   return persist;
 };
 
+const pointingRoom = async ({ req, token }) => {
+  const { group_id, exam_id, room_id } = req.body;
+
+  const members = await model.User.findAll({
+    where: { group_id: group_id },
+  });
+
+  const questions = await model.ExamQuestion.findAll({
+    include: [{ model: model.Question, include: [{ model: model.Answer }] }],
+    where: {
+      exam_id: exam_id,
+    },
+  });
+
+  const results = await model.Result.findAll({
+    where: {
+      room_id: room_id,
+    },
+  });
+
+  for (const member of members) {
+    const resultBelongToMember = results.filter(
+      (item) => item.created_id === member.id
+    );
+
+    const point = questions.reduce((sum, question) => {
+      const questionDetail = question?.tb_question ?? {};
+
+      const resultBelongToQuestion = resultBelongToMember.filter(
+        (item) => item.question_id === questionDetail?.id
+      );
+
+      const correctAnswers = (questionDetail?.tb_answers ?? []).flatMap(
+        (item) => (parseInt(item.percent) > 0 ? [item.id] : [])
+      );
+
+      const isCorrect =
+        resultBelongToQuestion.length === correctAnswers.length &&
+        resultBelongToQuestion.every((item) =>
+          correctAnswers.includes(item.id)
+        );
+      const point = !isNaN(questionDetail?.point)
+        ? parseFloat(questionDetail?.point)
+        : 0;
+
+      return isCorrect ? sum + point : sum;
+    }, 0);
+
+    await model.Mark.create({
+      id: v4(),
+      user_id: member.id,
+      room_id: room_id,
+      mark: point,
+      created_id: token.id,
+      updated_id: token.id,
+      deleted: "N",
+    });
+
+    await model.Room.update(
+      {
+        marked: "Y",
+        updated_id: token.id,
+      },
+      {
+        where: { id: room_id },
+      }
+    );
+  }
+
+  return true;
+};
+
 module.exports = {
   getRooms,
   getRoomDetail,
@@ -283,4 +356,5 @@ module.exports = {
   teacherRejectRequestJoinRoom,
   studentCancelRequestJoinRoom,
   studentForceLeaveRoom,
+  pointingRoom,
 };

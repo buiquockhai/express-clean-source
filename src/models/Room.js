@@ -41,6 +41,9 @@ module.exports = (sequelize, DataTypes) => {
       member_status: {
         type: DataTypes.STRING,
       },
+      marked: {
+        type: DataTypes.STRING,
+      },
       start_date: {
         type: DataTypes.DATE,
       },
