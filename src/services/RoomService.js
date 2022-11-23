@@ -2,7 +2,7 @@ const { v4 } = require("uuid");
 const { Op } = require("sequelize");
 const model = require("../models");
 const { socketInstance } = require("../socket/instance");
-const { SocketListener } = require("../socket/keys");
+const { SocketEmitter } = require("../socket/keys");
 
 const getRooms = async ({ req }) => {
   const result = await model.Room.findAll({
@@ -69,6 +69,7 @@ const verifyTeacherJoinRoom = async ({ req, token }) => {
     await model.Room.update(
       {
         status: "1",
+        updated_id: token.id,
       },
       {
         where: {
@@ -83,14 +84,192 @@ const verifyTeacherJoinRoom = async ({ req, token }) => {
   return false;
 };
 
-const verifyStudentJoinRoom = async ({ req }) => {
+const verifyStudentJoinRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
-      id: req.body.id,
+      id: req.body.room_id,
     },
   });
 
-  return persist?.group_id === req.body.group_id ? persist : false;
+  if (persist?.group_id === req.body.group_id && persist.status === "1") {
+    const memberStatus = persist?.member_status ?? "";
+
+    const object = memberStatus.length > 0 ? JSON.parse(memberStatus) : {};
+    const updateObject = {
+      ...object,
+      [token.id]: "1",
+    };
+
+    await model.Room.update(
+      {
+        member_status: JSON.stringify(updateObject),
+      },
+      {
+        where: {
+          id: persist?.id,
+        },
+      }
+    );
+
+    socketInstance.getIO().emit(SocketEmitter.serverFeedbackJoinRoom, {
+      roomId: req.body.room_id,
+      groupId: req.body.group_id,
+      userId: token.id,
+      proctorId: persist.proctor_id,
+    });
+
+    return persist;
+  }
+
+  return false;
+};
+
+const teacherAcceptRequestJoinRoom = async ({ req, token }) => {
+  const persist = await model.Room.findOne({
+    where: {
+      id: req.body.room_id,
+    },
+  });
+
+  if (persist?.id) {
+    const object = persist?.member_status
+      ? JSON.parse(persist.member_status)
+      : {};
+
+    const updatedObject = {
+      ...object,
+      [req.body.student_id]: "2",
+    };
+
+    await model.Room.update(
+      {
+        member_status: JSON.stringify(updatedObject),
+        updated_id: token.id,
+      },
+      {
+        where: { id: persist?.id },
+      }
+    );
+
+    socketInstance.getIO().emit(SocketEmitter.serverFeedbackAcceptJoinRoom, {
+      studentId: req.body.student_id,
+      proctorId: persist?.proctor_id,
+      roomId: persist?.id,
+    });
+  }
+
+  return persist;
+};
+
+const teacherRejectRequestJoinRoom = async ({ req, token }) => {
+  const persist = await model.Room.findOne({
+    where: {
+      id: req.body.room_id,
+    },
+  });
+
+  if (persist?.id) {
+    const object = persist?.member_status
+      ? JSON.parse(persist.member_status)
+      : {};
+
+    const updatedObject = {
+      ...object,
+      [req.body.student_id]: "0",
+    };
+
+    await model.Room.update(
+      {
+        member_status: JSON.stringify(updatedObject),
+        updated_id: token.id,
+      },
+      {
+        where: { id: persist?.id },
+      }
+    );
+
+    socketInstance.getIO().emit(SocketEmitter.serverFeedbackRejectJoinRoom, {
+      studentId: req.body.student_id,
+      proctorId: persist?.proctor_id,
+      roomId: persist?.id,
+    });
+  }
+
+  return persist;
+};
+
+const studentCancelRequestJoinRoom = async ({ req, token }) => {
+  const persist = await model.Room.findOne({
+    where: {
+      id: req.body.room_id,
+    },
+  });
+
+  if (persist?.id) {
+    const object = persist?.member_status
+      ? JSON.parse(persist.member_status)
+      : {};
+
+    const updatedObject = {
+      ...object,
+      [req.body.student_id]: "0",
+    };
+
+    await model.Room.update(
+      {
+        member_status: JSON.stringify(updatedObject),
+        updated_id: token.id,
+      },
+      {
+        where: { id: persist?.id },
+      }
+    );
+
+    socketInstance.getIO().emit(SocketEmitter.serverFeedbackCancelJoinRoom, {
+      studentId: req.body.student_id,
+      proctorId: persist?.proctor_id,
+      roomId: persist?.id,
+    });
+  }
+
+  return persist;
+};
+
+const studentForceLeaveRoom = async ({ req, token }) => {
+  const persist = await model.Room.findOne({
+    where: {
+      id: req.body.room_id,
+    },
+  });
+
+  if (persist?.id) {
+    const object = persist?.member_status
+      ? JSON.parse(persist.member_status)
+      : {};
+
+    const updatedObject = {
+      ...object,
+      [req.body.student_id]: "3",
+    };
+
+    await model.Room.update(
+      {
+        member_status: JSON.stringify(updatedObject),
+        updated_id: token.id,
+      },
+      {
+        where: { id: persist?.id },
+      }
+    );
+
+    socketInstance.getIO().emit(SocketEmitter.serverFeedbackForceLeave, {
+      studentId: req.body.student_id,
+      proctorId: persist?.proctor_id,
+      roomId: persist?.id,
+    });
+  }
+
+  return persist;
 };
 
 module.exports = {
@@ -100,4 +279,8 @@ module.exports = {
   updateRoom,
   verifyTeacherJoinRoom,
   verifyStudentJoinRoom,
+  teacherAcceptRequestJoinRoom,
+  teacherRejectRequestJoinRoom,
+  studentCancelRequestJoinRoom,
+  studentForceLeaveRoom,
 };

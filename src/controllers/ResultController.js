@@ -4,6 +4,7 @@ const {
   getResultDetail,
   newResult,
   updateResult,
+  pushResult,
 } = require("../services/ResultService");
 const { wrapper } = require("../util/functions");
 
@@ -11,6 +12,7 @@ const { wrapper } = require("../util/functions");
  ** 1. Create endpoints
  */
 
+router.post("/push-result", wrapper(pushResult));
 router.post("/", wrapper(newResult));
 
 /*

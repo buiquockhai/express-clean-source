@@ -6,7 +6,10 @@ const getQuestions = async ({ req }) => {
   const { id, ...rest } = req.query;
   const result = await model.Question.findAll({
     include: [{ model: model.Folder }, { model: model.Answer }],
-    order: [["created_date", "DESC"]],
+    order: [
+      ["created_date", "DESC"],
+      [model.Answer, "id", "DESC"],
+    ],
     where: id
       ? {
           ...rest,

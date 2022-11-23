@@ -2,11 +2,7 @@ const debug = require("debug")("literate-server:server");
 const http = require("http");
 const app = require("../src/app");
 const db = require("../src/models");
-const {
-  SocketListener,
-  SocketRoom,
-  SocketEmitter,
-} = require("../src/socket/keys");
+const { SocketListener, SocketEmitter } = require("../src/socket/keys");
 const { socketInstance } = require("../src/socket/instance");
 const { PORT, HOST } = require("../src/util/constraints");
 
@@ -18,11 +14,6 @@ socketInstance.setIO(server);
 let io = socketInstance.getIO();
 
 io.on(SocketListener.connection, (socket) => {
-  socket.on(SocketListener.clientSendCreateRoom, (roomId) => {
-    console.log("** joined new room **", roomId);
-    socket.join(roomId);
-  });
-
   socket.on(SocketListener.clientSendSubmitExam, (data) => {
     socket.broadcast.emit(SocketEmitter.serverFeedbackSubmitExam, {
       message: "Giảng viên submit đề thi",
@@ -35,13 +26,6 @@ io.on(SocketListener.connection, (socket) => {
       target: data.target,
       message: "Đề thi bị quản trị viên từ chối",
       description: data.examTitle,
-    });
-  });
-
-  socket.on(SocketListener.clientSendJoinRoom, (data) => {
-    socket.join(data?.roomId);
-    socket.to(data?.roomId).emit(SocketEmitter.serverFeedbackJoinRoom, {
-      studentId: data.studentId,
     });
   });
 

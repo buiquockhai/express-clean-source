@@ -38,6 +38,9 @@ module.exports = (sequelize, DataTypes) => {
       proctor_name: {
         type: DataTypes.STRING,
       },
+      member_status: {
+        type: DataTypes.STRING,
+      },
       start_date: {
         type: DataTypes.DATE,
       },
