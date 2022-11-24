@@ -55,6 +55,9 @@ module.exports = (sequelize, DataTypes) => {
       start_date: {
         type: DataTypes.DATE,
       },
+      teacher_start_date: {
+        type: DataTypes.DATE,
+      },
       created_date: {
         type: DataTypes.DATE,
       },

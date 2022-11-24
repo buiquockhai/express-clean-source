@@ -24,7 +24,10 @@ const getExamDetail = async ({ req }) => {
   const questionIds = questionBelongToExam.map((item) => item.question_id);
 
   const questionList = await model.Question.findAll({
-    include: [{ model: model.Folder }, { model: model.Answer }],
+    include: [
+      { model: model.Folder, where: { deleted: "N" } },
+      { model: model.Answer, where: { deleted: "N" } },
+    ],
     where: {
       id: { [Op.in]: questionIds },
       deleted: "N",
@@ -88,7 +91,7 @@ const updateExam = async ({ req, token }) => {
         updated_id: token.id,
         deleted: "Y",
       },
-      { where: { question_id: id } }
+      { where: { exam_id: id } }
     );
 
     questions.forEach(async (item) => {

@@ -14,7 +14,13 @@ const getMarks = async ({ req }) => {
 
 const getFullMarks = async ({ req }) => {
   const result = await model.Mark.findAll({
-    include: [{ model: model.Room, include: [{ model: model.Exam }] }],
+    include: [
+      {
+        model: model.Room,
+        where: { deleted: "N" },
+        include: [{ model: model.Exam, where: { deleted: "N" } }],
+      },
+    ],
     where: {
       ...req?.query,
       deleted: "N",

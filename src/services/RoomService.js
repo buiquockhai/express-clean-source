@@ -63,6 +63,7 @@ const verifyTeacherJoinRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
       id: req.body.id,
+      deleted: "N",
     },
   });
 
@@ -89,6 +90,7 @@ const verifyStudentJoinRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
       id: req.body.room_id,
+      deleted: "N",
     },
   });
 
@@ -129,13 +131,15 @@ const teacherAcceptRequestJoinRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
       id: req.body.room_id,
+      deleted: "N",
     },
   });
 
   if (persist?.id) {
-    const object = persist?.member_status
-      ? JSON.parse(persist.member_status)
-      : {};
+    const object =
+      persist?.member_status?.length > 10
+        ? JSON.parse(persist.member_status)
+        : {};
 
     const updatedObject = {
       ...object,
@@ -166,13 +170,15 @@ const teacherRejectRequestJoinRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
       id: req.body.room_id,
+      deleted: "N",
     },
   });
 
   if (persist?.id) {
-    const object = persist?.member_status
-      ? JSON.parse(persist.member_status)
-      : {};
+    const object =
+      persist?.member_status?.length > 10
+        ? JSON.parse(persist.member_status)
+        : {};
 
     const updatedObject = {
       ...object,
@@ -203,13 +209,15 @@ const studentCancelRequestJoinRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
       id: req.body.room_id,
+      deleted: "N",
     },
   });
 
   if (persist?.id) {
-    const object = persist?.member_status
-      ? JSON.parse(persist.member_status)
-      : {};
+    const object =
+      persist?.member_status?.length > 10
+        ? JSON.parse(persist.member_status)
+        : {};
 
     const updatedObject = {
       ...object,
@@ -240,13 +248,15 @@ const studentForceLeaveRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
       id: req.body.room_id,
+      deleted: "N",
     },
   });
 
   if (persist?.id) {
-    const object = persist?.member_status
-      ? JSON.parse(persist.member_status)
-      : {};
+    const object =
+      persist?.member_status?.length > 10
+        ? JSON.parse(persist.member_status)
+        : {};
 
     const updatedObject = {
       ...object,
@@ -277,19 +287,27 @@ const pointingRoom = async ({ req, token }) => {
   const { group_id, exam_id, room_id } = req.body;
 
   const members = await model.User.findAll({
-    where: { group_id: group_id },
+    where: { group_id: group_id, deleted: "N" },
   });
 
   const questions = await model.ExamQuestion.findAll({
-    include: [{ model: model.Question, include: [{ model: model.Answer }] }],
+    include: [
+      {
+        model: model.Question,
+        where: { deleted: "N" },
+        include: [{ model: model.Answer, where: { deleted: "N" } }],
+      },
+    ],
     where: {
       exam_id: exam_id,
+      deleted: "N",
     },
   });
 
   const results = await model.Result.findAll({
     where: {
       room_id: room_id,
+      deleted: "N",
     },
   });
 
@@ -345,25 +363,33 @@ const pointingRoom = async ({ req, token }) => {
   return true;
 };
 
-const closeRoom = async ({ req }) => {
+const closeRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
       id: req.body.room_id,
+      deleted: "N",
     },
   });
 
   if (persist.id) {
-    const object = persist?.member_status
-      ? JSON.parse(persist.member_status)
-      : {};
+    const object =
+      persist?.member_status?.length > 10
+        ? JSON.parse(persist.member_status)
+        : {};
 
-    const serverFeedbackCloseRoom = Object.entries(object).flatMap(
-      ([key, value]) => (value === "2" ? [key] : [])
+    const studentIds = Object.entries(object).flatMap(([key, value]) =>
+      value === "2" || value === "3" ? [key] : []
+    );
+
+    const parseToSubmission = studentIds.reduce(
+      (obj, item) => ({ ...obj, [item]: "3" }),
+      object
     );
 
     await model.Room.update(
       {
         status: "2",
+        member_status: JSON.stringify(parseToSubmission),
         updated_id: token.id,
       },
       {
@@ -373,7 +399,78 @@ const closeRoom = async ({ req }) => {
 
     socketInstance.getIO().emit(SocketEmitter.serverFeedbackCloseRoom, {
       roomId: persist.id,
-      studentIds: serverFeedbackCloseRoom,
+      studentIds: studentIds,
+    });
+  }
+
+  return true;
+};
+
+const teacherOpenRoom = async ({ req, token }) => {
+  const persist = await model.Room.findOne({
+    where: {
+      id: req.body.room_id,
+      deleted: "N",
+    },
+  });
+
+  if (persist.id) {
+    const object =
+      persist?.member_status?.length > 10
+        ? JSON.parse(persist.member_status)
+        : {};
+
+    const studentIds = Object.entries(object).flatMap(([key, value]) =>
+      value === "2" ? [key] : []
+    );
+
+    await model.Room.update(
+      {
+        teacher_start_date: new Date().toISOString(),
+        updated_id: token.id,
+      },
+      {
+        where: { id: persist.id },
+      }
+    );
+
+    socketInstance.getIO().emit(SocketEmitter.serverFeedbackOpenRoom, {
+      roomId: persist.id,
+      studentIds: studentIds,
+    });
+  }
+
+  return true;
+};
+
+const studentSubmit = async ({ req, token }) => {
+  const persist = await model.Room.findOne({
+    where: {
+      id: req.body.room_id,
+      deleted: "N",
+    },
+  });
+
+  if (persist.id) {
+    const object =
+      persist?.member_status?.length > 10
+        ? JSON.parse(persist.member_status)
+        : {};
+
+    const updatedObject = { ...object, [token.id]: "3" };
+
+    await model.Room.update(
+      {
+        member_status: JSON.stringify(updatedObject),
+      },
+      {
+        where: { id: persist.id },
+      }
+    );
+
+    socketInstance.getIO().emit(SocketEmitter.serverFeedbackStudentSubmit, {
+      roomId: persist.id,
+      proctorId: persist.proctor_id,
     });
   }
 
@@ -393,4 +490,6 @@ module.exports = {
   studentForceLeaveRoom,
   pointingRoom,
   closeRoom,
+  teacherOpenRoom,
+  studentSubmit,
 };

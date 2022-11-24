@@ -5,7 +5,10 @@ const model = require("../models");
 const getQuestions = async ({ req }) => {
   const { id, ...rest } = req.query;
   const result = await model.Question.findAll({
-    include: [{ model: model.Folder }, { model: model.Answer }],
+    include: [
+      { model: model.Folder, where: { deleted: "N" } },
+      { model: model.Answer, where: { deleted: "N" } },
+    ],
     order: [
       ["created_date", "DESC"],
       [model.Answer, "id", "DESC"],
@@ -26,7 +29,10 @@ const getQuestions = async ({ req }) => {
 
 const getQuestionDetail = async ({ req }) => {
   const result = await model.Question.findOne({
-    include: [{ model: model.Folder }, { model: model.Answer }],
+    include: [
+      { model: model.Folder, where: { deleted: "N" } },
+      { model: model.Answer, where: { deleted: "N" } },
+    ],
     where: {
       ...req.params,
       deleted: "N",
@@ -37,7 +43,7 @@ const getQuestionDetail = async ({ req }) => {
 
 const getFolders = async ({ req }) => {
   const result = await model.Folder.findAll({
-    include: [{ model: model.Question }],
+    include: [{ model: model.Question, where: { deleted: "N" } }],
     order: [["created_date", "DESC"]],
     where: {
       ...req?.query,
@@ -49,7 +55,7 @@ const getFolders = async ({ req }) => {
 
 const getTree = async ({ _, token }) => {
   const parents = await model.Folder.findAll({
-    include: [{ model: model.Question }],
+    include: [{ model: model.Question, where: { deleted: "N" } }],
     where: {
       created_id: token.id,
       deleted: "N",

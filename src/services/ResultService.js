@@ -9,9 +9,10 @@ const getResults = async ({ req }) => {
     include: [
       {
         model: model.Question,
-        include: [{ model: model.Answer }],
+        where: { deleted: "N" },
+        include: [{ model: model.Answer, where: { deleted: "N" } }],
       },
-      { model: model.User },
+      { model: model.User, where: { deleted: "N" } },
     ],
     where: {
       ...req?.query,
@@ -25,8 +26,12 @@ const getResults = async ({ req }) => {
 const getResultDetail = async ({ req }) => {
   const result = await model.Result.findOne({
     include: [
-      { model: model.Question, include: [{ model: model.Answer }] },
-      { model: model.User },
+      {
+        model: model.Question,
+        where: { deleted: "N" },
+        include: [{ model: model.Answer, where: { deleted: "N" } }],
+      },
+      { model: model.User, where: { deleted: "N" } },
     ],
     where: {
       id: req.params.id,

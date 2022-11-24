@@ -12,6 +12,8 @@ const {
   studentForceLeaveRoom,
   pointingRoom,
   closeRoom,
+  teacherOpenRoom,
+  studentSubmit,
 } = require("../services/RoomService");
 const { wrapper } = require("../util/functions");
 
@@ -19,6 +21,8 @@ const { wrapper } = require("../util/functions");
  ** 1. Create endpoints
  */
 
+router.post("/student-submit", wrapper(studentSubmit));
+router.post("/open-room", wrapper(teacherOpenRoom));
 router.post("/close-room", wrapper(closeRoom));
 router.post("/pointing-room", wrapper(pointingRoom));
 router.post("/force-leave", wrapper(studentForceLeaveRoom));
