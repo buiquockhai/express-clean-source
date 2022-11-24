@@ -345,6 +345,41 @@ const pointingRoom = async ({ req, token }) => {
   return true;
 };
 
+const closeRoom = async ({ req }) => {
+  const persist = await model.Room.findOne({
+    where: {
+      id: req.body.room_id,
+    },
+  });
+
+  if (persist.id) {
+    const object = persist?.member_status
+      ? JSON.parse(persist.member_status)
+      : {};
+
+    const serverFeedbackCloseRoom = Object.entries(object).flatMap(
+      ([key, value]) => (value === "2" ? [key] : [])
+    );
+
+    await model.Room.update(
+      {
+        status: "2",
+        updated_id: token.id,
+      },
+      {
+        where: { id: persist.id },
+      }
+    );
+
+    socketInstance.getIO().emit(SocketEmitter.serverFeedbackCloseRoom, {
+      roomId: persist.id,
+      studentIds: serverFeedbackCloseRoom,
+    });
+  }
+
+  return true;
+};
+
 module.exports = {
   getRooms,
   getRoomDetail,
@@ -357,4 +392,5 @@ module.exports = {
   studentCancelRequestJoinRoom,
   studentForceLeaveRoom,
   pointingRoom,
+  closeRoom,
 };

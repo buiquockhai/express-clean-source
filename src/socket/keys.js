@@ -15,6 +15,7 @@ const SocketEmitter = {
   serverFeedbackUpdateAnswer: "server-feedback-update-answer",
   serverFeedbackForceLeave: "server-feedback-force-leave",
   serverFeedbackPenalty: "server-feedback-penalty",
+  serverFeedbackCloseRoom: "server-feedback-close-room",
 };
 
 module.exports = {
