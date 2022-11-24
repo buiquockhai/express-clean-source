@@ -4,7 +4,15 @@ module.exports = (sequelize, DataTypes) => {
   class Room extends Model {
     static className = "Room";
 
-    static associate(models) {}
+    static associate(models) {
+      Room.hasMany(models.Mark, {
+        foreignKey: "room_id",
+      });
+
+      Room.belongsTo(models.Exam, {
+        foreignKey: "exam_id",
+      });
+    }
   }
 
   Room.init(

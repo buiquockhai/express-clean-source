@@ -4,6 +4,7 @@ const {
   getMarkDetail,
   newMark,
   updateMark,
+  getFullMarks,
 } = require("../services/MarkService");
 const { wrapper } = require("../util/functions");
 
@@ -23,6 +24,7 @@ router.put("/", wrapper(updateMark));
  ** 3. Get endpoints
  */
 
+router.get("/full-marks", wrapper(getFullMarks));
 router.get("/:id", wrapper(getMarkDetail));
 router.get("/", wrapper(getMarks));
 

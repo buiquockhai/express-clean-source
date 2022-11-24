@@ -12,6 +12,18 @@ const getMarks = async ({ req }) => {
   return result;
 };
 
+const getFullMarks = async ({ req }) => {
+  const result = await model.Mark.findAll({
+    include: [{ model: model.Room, include: [{ model: model.Exam }] }],
+    where: {
+      ...req?.query,
+      deleted: "N",
+    },
+    order: [["created_date", "DESC"]],
+  });
+  return result;
+};
+
 const getMarkDetail = async ({ req }) => {
   const result = await model.Mark.findOne({
     where: {
@@ -53,4 +65,5 @@ module.exports = {
   getMarkDetail,
   newMark,
   updateMark,
+  getFullMarks,
 };

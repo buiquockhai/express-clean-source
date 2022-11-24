@@ -312,7 +312,7 @@ const pointingRoom = async ({ req, token }) => {
       const isCorrect =
         resultBelongToQuestion.length === correctAnswers.length &&
         resultBelongToQuestion.every((item) =>
-          correctAnswers.includes(item.id)
+          correctAnswers.includes(item.selected_answer_id)
         );
       const point = !isNaN(questionDetail?.point)
         ? parseFloat(questionDetail?.point)

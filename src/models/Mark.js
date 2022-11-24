@@ -4,7 +4,11 @@ module.exports = (sequelize, DataTypes) => {
   class Mark extends Model {
     static className = "Mark";
 
-    static associate(models) {}
+    static associate(models) {
+      Mark.belongsTo(models.Room, {
+        foreignKey: "room_id",
+      });
+    }
   }
 
   Mark.init(
