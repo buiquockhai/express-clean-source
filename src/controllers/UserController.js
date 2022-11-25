@@ -16,7 +16,7 @@ const { wrapper } = require("../util/functions");
  */
 
 router.post("/login", wrapper(getToken, { ignoreAuth: true }));
-router.post("/", wrapper(newUser));
+router.post("/", wrapper(newUser, { ignoreAuth: true }));
 
 /*
  ** 2. Update endpoints

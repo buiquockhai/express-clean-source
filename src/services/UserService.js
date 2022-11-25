@@ -2,7 +2,7 @@ const model = require("../models");
 const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
 const { v4 } = require("uuid");
-const { JWT_PRIVATE_KEY } = require("../util/constraints");
+const { JWT_PRIVATE_KEY, ADMIN_ID } = require("../util/constraints");
 
 const getToken = async ({ req }) => {
   const { username, password } = req.body;
@@ -98,25 +98,53 @@ const changePassword = async ({ req, token }) => {
   return false;
 };
 
-const newUser = async ({ req, token }) => {
-  const result = await model.User.create({
-    id: v4(),
-    role: req.body.role,
-    name: req.body.name,
-    code: req.body.code,
-    gender: req.body.gender,
-    date_of_birth: req.body.date_of_birth,
-    group_id: req.body.group_id,
-    group_title: req.body.group_title,
-    phone: req.body.phone,
-    address: req.body.address,
-    contact: req.body.contact,
-    avatar: req.body.avatar,
-    created_id: token.id,
-    updated_id: token.id,
-    deleted: "N",
+const newUser = async ({ req }) => {
+  const config = await model.Configuration.findAll({
+    where: {
+      deleted: "N",
+    },
   });
-  return result;
+
+  if (config) {
+    const arrToObject = config.reduce(
+      (obj, item) => ({ ...obj, [item.key]: item.value }),
+      {}
+    );
+
+    let role = null;
+
+    if (req.body.secret_key === arrToObject.teacher_registry_code) {
+      role = "teacher";
+    }
+
+    if (req.body.secret_key === arrToObject.student_registry_code) {
+      role = "student";
+    }
+
+    if (role) {
+      const result = await model.User.create({
+        id: v4(),
+        role: role,
+        name: req.body.name,
+        code: new Date().getTime().toString(),
+        gender: req.body.gender,
+        date_of_birth: req.body.date_of_birth,
+        phone: req.body.phone,
+        address: req.body.address,
+        contact: req.body.contact,
+        avatar: req.body.avatar,
+        address: req.body.address,
+        password: req.body.password,
+        created_id: ADMIN_ID,
+        updated_id: ADMIN_ID,
+        deleted: "N",
+      });
+
+      return result;
+    }
+  }
+
+  return null;
 };
 
 module.exports = {

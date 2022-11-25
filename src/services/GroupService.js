@@ -15,7 +15,7 @@ const getGroups = async ({ req }) => {
 
 const getGroupDetail = async ({ req }) => {
   const result = await model.Group.findOne({
-    include: [{ model: model.User, where: { deleted: "N" } }],
+    include: [{ model: model.User, required: false, where: { deleted: "N" } }],
     where: {
       id: req.params.id,
       deleted: "N",

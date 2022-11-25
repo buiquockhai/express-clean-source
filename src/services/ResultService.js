@@ -9,10 +9,13 @@ const getResults = async ({ req }) => {
     include: [
       {
         model: model.Question,
+        required: false,
         where: { deleted: "N" },
-        include: [{ model: model.Answer, where: { deleted: "N" } }],
+        include: [
+          { model: model.Answer, required: false, where: { deleted: "N" } },
+        ],
       },
-      { model: model.User, where: { deleted: "N" } },
+      { model: model.User, required: false, where: { deleted: "N" } },
     ],
     where: {
       ...req?.query,
@@ -28,10 +31,13 @@ const getResultDetail = async ({ req }) => {
     include: [
       {
         model: model.Question,
+        required: false,
         where: { deleted: "N" },
-        include: [{ model: model.Answer, where: { deleted: "N" } }],
+        include: [
+          { model: model.Answer, required: false, where: { deleted: "N" } },
+        ],
       },
-      { model: model.User, where: { deleted: "N" } },
+      { model: model.User, required: false, where: { deleted: "N" } },
     ],
     where: {
       id: req.params.id,

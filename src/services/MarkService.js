@@ -17,8 +17,11 @@ const getFullMarks = async ({ req }) => {
     include: [
       {
         model: model.Room,
+        required: false,
         where: { deleted: "N" },
-        include: [{ model: model.Exam, where: { deleted: "N" } }],
+        include: [
+          { model: model.Exam, required: false, where: { deleted: "N" } },
+        ],
       },
     ],
     where: {

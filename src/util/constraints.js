@@ -20,9 +20,12 @@ const PG_CONFIG = {
 
 const JWT_PRIVATE_KEY = "yUfLQdAgyj+9Qkx";
 
+const ADMIN_ID = "88785352-c404-4546-8bd9-8efedbe9182f";
+
 module.exports = {
   PG_CONFIG,
   HOST,
   PORT,
   JWT_PRIVATE_KEY,
+  ADMIN_ID,
 };

@@ -294,8 +294,11 @@ const pointingRoom = async ({ req, token }) => {
     include: [
       {
         model: model.Question,
+        required: false,
         where: { deleted: "N" },
-        include: [{ model: model.Answer, where: { deleted: "N" } }],
+        include: [
+          { model: model.Answer, required: false, where: { deleted: "N" } },
+        ],
       },
     ],
     where: {

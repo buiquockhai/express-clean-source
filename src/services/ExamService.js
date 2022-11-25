@@ -25,8 +25,8 @@ const getExamDetail = async ({ req }) => {
 
   const questionList = await model.Question.findAll({
     include: [
-      { model: model.Folder, where: { deleted: "N" } },
-      { model: model.Answer, where: { deleted: "N" } },
+      { model: model.Folder, required: false, where: { deleted: "N" } },
+      { model: model.Answer, required: false, where: { deleted: "N" } },
     ],
     where: {
       id: { [Op.in]: questionIds },
