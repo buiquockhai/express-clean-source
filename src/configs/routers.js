@@ -9,11 +9,13 @@ const RoomController = require("../controllers/RoomController");
 const ViolatingRuleController = require("../controllers/ViolatingRuleController");
 const ConfigurationController = require("../controllers/ConfigurationController");
 const NotificationController = require("../controllers/NotificationController");
+const UserRoomController = require("../controllers/UserRoomController");
 
 const router = require("express").Router();
 
 router.use("/v1/ping", PingController);
 router.use("/v1/user", UserController);
+router.use("/v1/user-room", UserRoomController);
 router.use("/v1/question", QuestionController);
 router.use("/v1/exam", ExamController);
 router.use("/v1/group", GroupController);

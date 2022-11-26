@@ -1,59 +1,39 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class Room extends Model {
-    static className = "Room";
+  class UserRoom extends Model {
+    static className = "UserRoom";
 
     static associate(models) {
-      Room.hasMany(models.Mark, {
-        foreignKey: "room_id",
-      });
-
-      Room.belongsTo(models.Exam, {
-        foreignKey: "exam_id",
+      UserRoom.belongsTo(models.User, {
+        foreignKey: "user_id",
       });
     }
   }
 
-  Room.init(
+  UserRoom.init(
     {
       id: {
         type: DataTypes.UUID,
         primaryKey: true,
         allowNull: false,
       },
-      title: {
-        type: DataTypes.STRING,
+      user_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+      },
+      room_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
       },
       status: {
         type: DataTypes.STRING,
       },
-      exam_id: {
-        type: DataTypes.UUID,
-      },
-      exam_title: {
+      verified: {
         type: DataTypes.STRING,
       },
-      group_id: {
-        type: DataTypes.UUID,
-      },
-      group_title: {
+      description: {
         type: DataTypes.STRING,
-      },
-      proctor_id: {
-        type: DataTypes.UUID,
-      },
-      proctor_name: {
-        type: DataTypes.STRING,
-      },
-      marked: {
-        type: DataTypes.STRING,
-      },
-      start_date: {
-        type: DataTypes.DATE,
-      },
-      teacher_start_date: {
-        type: DataTypes.DATE,
       },
       created_date: {
         type: DataTypes.DATE,
@@ -73,12 +53,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "tb_room",
+      modelName: "tb_user_room",
       freezeTableName: true,
       createdAt: "created_date",
       updatedAt: "updated_date",
       timestamps: true,
     }
   );
-  return Room;
+  return UserRoom;
 };

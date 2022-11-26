@@ -3,7 +3,6 @@ const {
   getToken,
   getUsers,
   getUserDetail,
-  getForceUserDetail,
   updateUser,
   newUser,
   changePassword,

@@ -26,8 +26,17 @@ const getRoomDetail = async ({ req }) => {
 };
 
 const newRoom = async ({ req, token }) => {
+  const users = await model.User.findAll({
+    where: {
+      group_id: req.body.group_id,
+      deleted: "N",
+    },
+  });
+
+  const newRoomId = v4();
+
   const result = await model.Room.create({
-    id: v4(),
+    id: newRoomId,
     status: req.body.status,
     title: req.body.title,
     exam_id: req.body.exam_id,
@@ -42,6 +51,23 @@ const newRoom = async ({ req, token }) => {
     updated_id: token.id,
     deleted: "N",
   });
+
+  if (users) {
+    for (const user of users) {
+      await model.UserRoom.create({
+        id: v4(),
+        user_id: user.id,
+        room_id: newRoomId,
+        status: 0,
+        verified: "N",
+        description: "",
+        created_id: token.id,
+        updated_id: token.id,
+        deleted: "N",
+      });
+    }
+  }
+
   return result;
 };
 
@@ -94,22 +120,16 @@ const verifyStudentJoinRoom = async ({ req, token }) => {
     },
   });
 
-  if (persist?.group_id === req.body.group_id && persist.status === "1") {
-    const memberStatus = persist?.member_status ?? "";
-
-    const object = memberStatus.length > 0 ? JSON.parse(memberStatus) : {};
-    const updateObject = {
-      ...object,
-      [token.id]: "1",
-    };
-
-    await model.Room.update(
+  if (persist.status === "1") {
+    await model.UserRoom.update(
       {
-        member_status: JSON.stringify(updateObject),
+        status: "1",
+        updated_id: token.id,
       },
       {
         where: {
-          id: persist?.id,
+          room_id: req.body.room_id,
+          user_id: token.id,
         },
       }
     );
@@ -124,7 +144,7 @@ const verifyStudentJoinRoom = async ({ req, token }) => {
     return persist;
   }
 
-  return false;
+  return null;
 };
 
 const teacherAcceptRequestJoinRoom = async ({ req, token }) => {
@@ -136,23 +156,16 @@ const teacherAcceptRequestJoinRoom = async ({ req, token }) => {
   });
 
   if (persist?.id) {
-    const object =
-      persist?.member_status?.length > 10
-        ? JSON.parse(persist.member_status)
-        : {};
-
-    const updatedObject = {
-      ...object,
-      [req.body.student_id]: "2",
-    };
-
-    await model.Room.update(
+    await model.UserRoom.update(
       {
-        member_status: JSON.stringify(updatedObject),
+        status: "2",
         updated_id: token.id,
       },
       {
-        where: { id: persist?.id },
+        where: {
+          room_id: req.body.room_id,
+          user_id: req.body.student_id,
+        },
       }
     );
 
@@ -161,9 +174,11 @@ const teacherAcceptRequestJoinRoom = async ({ req, token }) => {
       proctorId: persist?.proctor_id,
       roomId: persist?.id,
     });
+
+    return persist;
   }
 
-  return persist;
+  return null;
 };
 
 const teacherRejectRequestJoinRoom = async ({ req, token }) => {
@@ -175,23 +190,16 @@ const teacherRejectRequestJoinRoom = async ({ req, token }) => {
   });
 
   if (persist?.id) {
-    const object =
-      persist?.member_status?.length > 10
-        ? JSON.parse(persist.member_status)
-        : {};
-
-    const updatedObject = {
-      ...object,
-      [req.body.student_id]: "0",
-    };
-
-    await model.Room.update(
+    await model.UserRoom.update(
       {
-        member_status: JSON.stringify(updatedObject),
+        status: "0",
         updated_id: token.id,
       },
       {
-        where: { id: persist?.id },
+        where: {
+          room_id: req.body.room_id,
+          user_id: req.body.student_id,
+        },
       }
     );
 
@@ -200,9 +208,11 @@ const teacherRejectRequestJoinRoom = async ({ req, token }) => {
       proctorId: persist?.proctor_id,
       roomId: persist?.id,
     });
+
+    return persist;
   }
 
-  return persist;
+  return null;
 };
 
 const studentCancelRequestJoinRoom = async ({ req, token }) => {
@@ -214,23 +224,16 @@ const studentCancelRequestJoinRoom = async ({ req, token }) => {
   });
 
   if (persist?.id) {
-    const object =
-      persist?.member_status?.length > 10
-        ? JSON.parse(persist.member_status)
-        : {};
-
-    const updatedObject = {
-      ...object,
-      [req.body.student_id]: "0",
-    };
-
-    await model.Room.update(
+    await model.UserRoom.update(
       {
-        member_status: JSON.stringify(updatedObject),
+        status: "0",
         updated_id: token.id,
       },
       {
-        where: { id: persist?.id },
+        where: {
+          room_id: req.body.room_id,
+          user_id: token.id,
+        },
       }
     );
 
@@ -239,9 +242,11 @@ const studentCancelRequestJoinRoom = async ({ req, token }) => {
       proctorId: persist?.proctor_id,
       roomId: persist?.id,
     });
+
+    return persist;
   }
 
-  return persist;
+  return null;
 };
 
 const studentForceLeaveRoom = async ({ req, token }) => {
@@ -253,34 +258,31 @@ const studentForceLeaveRoom = async ({ req, token }) => {
   });
 
   if (persist?.id) {
-    const object =
-      persist?.member_status?.length > 10
-        ? JSON.parse(persist.member_status)
-        : {};
-
-    const updatedObject = {
-      ...object,
-      [req.body.student_id]: "3",
-    };
-
-    await model.Room.update(
+    await model.UserRoom.update(
       {
-        member_status: JSON.stringify(updatedObject),
+        status: "3",
+        description: req.body.description ?? "",
         updated_id: token.id,
       },
       {
-        where: { id: persist?.id },
+        where: {
+          room_id: req.body.room_id,
+          user_id: req.body.student_id,
+        },
       }
     );
 
     socketInstance.getIO().emit(SocketEmitter.serverFeedbackForceLeave, {
       studentId: req.body.student_id,
       proctorId: persist?.proctor_id,
+      description: req.body.description ?? "",
       roomId: persist?.id,
     });
+
+    return persist;
   }
 
-  return persist;
+  return null;
 };
 
 const pointingRoom = async ({ req, token }) => {
@@ -375,24 +377,29 @@ const closeRoom = async ({ req, token }) => {
   });
 
   if (persist.id) {
-    const object =
-      persist?.member_status?.length > 10
-        ? JSON.parse(persist.member_status)
-        : {};
+    const members = await model.UserRoom.findAll({
+      where: {
+        status: { [Op.in]: ["2", "3"] },
+        room_id: req.body.room_id,
+      },
+    });
 
-    const studentIds = Object.entries(object).flatMap(([key, value]) =>
-      value === "2" || value === "3" ? [key] : []
-    );
-
-    const parseToSubmission = studentIds.reduce(
-      (obj, item) => ({ ...obj, [item]: "3" }),
-      object
+    await model.UserRoom.update(
+      {
+        status: "3",
+        updated_id: token.id,
+      },
+      {
+        where: {
+          status: { [Op.in]: ["2", "3"] },
+          room_id: req.body.room_id,
+        },
+      }
     );
 
     await model.Room.update(
       {
         status: "2",
-        member_status: JSON.stringify(parseToSubmission),
         updated_id: token.id,
       },
       {
@@ -402,11 +409,13 @@ const closeRoom = async ({ req, token }) => {
 
     socketInstance.getIO().emit(SocketEmitter.serverFeedbackCloseRoom, {
       roomId: persist.id,
-      studentIds: studentIds,
+      studentIds: members.map((item) => item.user_id),
     });
+
+    return persist;
   }
 
-  return true;
+  return null;
 };
 
 const teacherOpenRoom = async ({ req, token }) => {
@@ -418,15 +427,6 @@ const teacherOpenRoom = async ({ req, token }) => {
   });
 
   if (persist.id) {
-    const object =
-      persist?.member_status?.length > 10
-        ? JSON.parse(persist.member_status)
-        : {};
-
-    const studentIds = Object.entries(object).flatMap(([key, value]) =>
-      value === "2" ? [key] : []
-    );
-
     await model.Room.update(
       {
         teacher_start_date: new Date().toISOString(),
@@ -437,13 +437,22 @@ const teacherOpenRoom = async ({ req, token }) => {
       }
     );
 
+    const members = await model.UserRoom.findAll({
+      where: {
+        status: "2",
+        room_id: req.body.room_id,
+      },
+    });
+
     socketInstance.getIO().emit(SocketEmitter.serverFeedbackOpenRoom, {
       roomId: persist.id,
-      studentIds: studentIds,
+      studentIds: members.map((item) => item.user_id),
     });
+
+    return persist;
   }
 
-  return true;
+  return null;
 };
 
 const studentSubmit = async ({ req, token }) => {
@@ -455,19 +464,16 @@ const studentSubmit = async ({ req, token }) => {
   });
 
   if (persist.id) {
-    const object =
-      persist?.member_status?.length > 10
-        ? JSON.parse(persist.member_status)
-        : {};
-
-    const updatedObject = { ...object, [token.id]: "3" };
-
-    await model.Room.update(
+    await model.UserRoom.update(
       {
-        member_status: JSON.stringify(updatedObject),
+        status: "3",
+        updated_id: token.id,
       },
       {
-        where: { id: persist.id },
+        where: {
+          room_id: req.body.room_id,
+          user_id: token.id,
+        },
       }
     );
 
@@ -475,9 +481,11 @@ const studentSubmit = async ({ req, token }) => {
       roomId: persist.id,
       proctorId: persist.proctor_id,
     });
+
+    return persist;
   }
 
-  return true;
+  return null;
 };
 
 module.exports = {
