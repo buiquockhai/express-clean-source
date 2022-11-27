@@ -22,6 +22,9 @@ module.exports = (sequelize, DataTypes) => {
       minus_point: {
         type: DataTypes.INTEGER,
       },
+      description: {
+        type: DataTypes.STRING,
+      },
       created_date: {
         type: DataTypes.DATE,
       },

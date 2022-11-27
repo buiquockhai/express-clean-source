@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
       UserRoom.belongsTo(models.User, {
         foreignKey: "user_id",
       });
+
+      UserRoom.belongsTo(models.Room, {
+        foreignKey: "room_id",
+      });
     }
   }
 

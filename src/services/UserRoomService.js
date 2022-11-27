@@ -3,7 +3,10 @@ const model = require("../models");
 const getUserRooms = async ({ req }) => {
   const result = await model.UserRoom.findAll({
     order: [["created_date", "DESC"]],
-    include: [{ model: model.User, required: false, where: { deleted: "N" } }],
+    include: [
+      { model: model.User, required: false, where: { deleted: "N" } },
+      { model: model.Room, required: false, where: { deleted: "N" } },
+    ],
     where: {
       ...req?.query,
       deleted: "N",

@@ -30,6 +30,7 @@ const newViolatingRule = async ({ req, token }) => {
     user_id: req.body.user_id,
     room_id: req.body.room_id,
     minus_point: req.body.minus_point,
+    description: req.body.description,
     created_id: token.id,
     updated_id: token.id,
     deleted: "N",

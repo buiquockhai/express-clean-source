@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "room_id",
       });
 
+      Room.hasMany(models.UserRoom, {
+        foreignKey: "room_id",
+      });
+
       Room.belongsTo(models.Exam, {
         foreignKey: "exam_id",
       });
