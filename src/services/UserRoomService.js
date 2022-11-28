@@ -91,22 +91,28 @@ const kickOutRoom = async ({ req, token }) => {
 const verifyLoadRoom = async ({ req, token }) => {
   if (req.body.role === "student") {
     const userInRoom = await model.UserRoom.findOne({
+      include: [
+        { model: model.Room, required: false, where: { deleted: "N" } },
+      ],
       where: {
         user_id: token.id,
         room_id: req.body.room_id,
       },
     });
 
-    return userInRoom?.status === "2";
+    return userInRoom?.status === "2" && userInRoom?.tb_room?.status === "1";
   } else {
     const room = await model.Room.findOne({
+      include: [
+        { model: model.Room, required: false, where: { deleted: "N" } },
+      ],
       where: {
         proctor_id: token.id,
         id: req.body.room_id,
       },
     });
 
-    return room?.proctor_id === token.id;
+    return room?.proctor_id === token.id && userInRoom?.tb_room?.status !== "2";
   }
 };
 

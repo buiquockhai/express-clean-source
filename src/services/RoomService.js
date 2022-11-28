@@ -7,6 +7,7 @@ const moment = require("moment");
 
 const getRooms = async ({ req }) => {
   const result = await model.Room.findAll({
+    include: [{ model: model.Exam, required: false, where: { deleted: "N" } }],
     order: [["created_date", "DESC"]],
     where: {
       ...req?.query,
@@ -18,6 +19,7 @@ const getRooms = async ({ req }) => {
 
 const getRoomDetail = async ({ req }) => {
   const result = await model.Room.findOne({
+    include: [{ model: model.Exam, required: false, where: { deleted: "N" } }],
     where: {
       id: req.params.id,
       deleted: "N",
