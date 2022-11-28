@@ -88,9 +88,32 @@ const kickOutRoom = async ({ req, token }) => {
   return null;
 };
 
+const verifyLoadRoom = async ({ req, token }) => {
+  if (req.body.role === "student") {
+    const userInRoom = await model.UserRoom.findOne({
+      where: {
+        user_id: token.id,
+        room_id: req.body.room_id,
+      },
+    });
+
+    return userInRoom?.status === "2";
+  } else {
+    const room = await model.Room.findOne({
+      where: {
+        proctor_id: token.id,
+        id: req.body.room_id,
+      },
+    });
+
+    return room?.proctor_id === token.id;
+  }
+};
+
 module.exports = {
   getUserRooms,
   getUserRoomById,
   teacherAuthStudent,
   kickOutRoom,
+  verifyLoadRoom,
 };

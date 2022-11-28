@@ -36,6 +36,16 @@ const newViolatingRule = async ({ req, token }) => {
     deleted: "N",
   });
 
+  await model.Notification.create({
+    id: v4(),
+    user_id: req.body.user_id,
+    title: "Trừ điểm cảnh cáo",
+    content: req.body.description ?? "",
+    created_id: token.id,
+    updated_id: token.id,
+    deleted: "N",
+  });
+
   socketInstance.getIO().emit(SocketEmitter.serverFeedbackPenalty, {
     studentId: req.body.user_id,
     roomId: req.body.room_id,

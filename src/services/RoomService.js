@@ -27,28 +27,32 @@ const getRoomDetail = async ({ req }) => {
 };
 
 const newRoom = async ({ req, token }) => {
-  // const rooms = await model.Room.findAll({
-  //   include: [{ model: model.Exam, required: false, where: { deleted: "N" } }],
-  //   where: {
-  //     group_id: req.body.group_id,
-  //   },
-  // });
+  const rooms = await model.Room.findAll({
+    include: [{ model: model.Exam, required: false, where: { deleted: "N" } }],
+    where: {
+      [Op.or]: [
+        {
+          group_id: req.body.group_id,
+        },
+        {
+          proctor_id: req.body.proctor_id,
+        },
+      ],
+    },
+  });
 
-  // const valid = rooms.every((item) => {
-  //   const before = moment(req.body.start_date)
-  //     .add(parseInt(req.body.duration), "minutes")
-  //     .isBefore(moment(item.start_date));
-  //   const after = moment(req, req.body.start_date).isAfter(
-  //     moment(item.start_date).add(parseInt(item.tb_exam.duration), "minutes")
-  //   );
-  //   return before || after;
-  // });
+  const valid = rooms.every((item) => {
+    const before = moment(req.body.start_date)
+      .add(parseInt(req.body.duration), "minutes")
+      .isBefore(moment(item.start_date));
+    const after = moment(req.body.start_date).isAfter(
+      moment(item.start_date).add(parseInt(item.tb_exam.duration), "minutes")
+    );
 
-  // if (!valid) {
-  //   return null;
-  // }
+    return before || after;
+  });
 
-  // return true;
+  if (!valid) return null;
 
   const users = await model.User.findAll({
     where: {
@@ -295,6 +299,16 @@ const hardSubmission = async ({ req, token }) => {
         },
       }
     );
+
+    await model.Notification.create({
+      id: v4(),
+      user_id: req.body.student_id,
+      title: "Buộc nộp bài",
+      content: req.body.description ?? "",
+      created_id: token.id,
+      updated_id: token.id,
+      deleted: "N",
+    });
 
     socketInstance.getIO().emit(SocketEmitter.serverFeedbackForceLeave, {
       studentId: req.body.student_id,

@@ -4,6 +4,7 @@ const {
   getUserRoomById,
   kickOutRoom,
   teacherAuthStudent,
+  verifyLoadRoom,
 } = require("../services/UserRoomService");
 const { wrapper } = require("../util/functions");
 
@@ -13,6 +14,7 @@ const { wrapper } = require("../util/functions");
 
 router.post("/auth-student", wrapper(teacherAuthStudent));
 router.post("/kick-out", wrapper(kickOutRoom));
+router.post("/verify-join-room", wrapper(verifyLoadRoom));
 
 /*
  ** 2. Update endpoints
