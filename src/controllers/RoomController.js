@@ -4,12 +4,12 @@ const {
   getRoomDetail,
   newRoom,
   updateRoom,
-  verifyTeacherJoinRoom,
-  verifyStudentJoinRoom,
+  teacherJoinRoom,
+  studentJoinRoom,
   teacherAcceptRequestJoinRoom,
   teacherRejectRequestJoinRoom,
   studentCancelRequestJoinRoom,
-  studentForceLeaveRoom,
+  hardSubmission,
   pointingRoom,
   closeRoom,
   teacherOpenRoom,
@@ -25,12 +25,12 @@ router.post("/student-submit", wrapper(studentSubmit));
 router.post("/open-room", wrapper(teacherOpenRoom));
 router.post("/close-room", wrapper(closeRoom));
 router.post("/pointing-room", wrapper(pointingRoom));
-router.post("/force-leave", wrapper(studentForceLeaveRoom));
+router.post("/force-leave", wrapper(hardSubmission));
 router.post("/teacher-accept-request", wrapper(teacherAcceptRequestJoinRoom));
 router.post("/teacher-reject-request", wrapper(teacherRejectRequestJoinRoom));
 router.post("/student-cancel-request", wrapper(studentCancelRequestJoinRoom));
-router.post("/teacher-join", wrapper(verifyTeacherJoinRoom));
-router.post("/student-join", wrapper(verifyStudentJoinRoom));
+router.post("/teacher-join", wrapper(teacherJoinRoom));
+router.post("/student-join", wrapper(studentJoinRoom));
 router.post("/", wrapper(newRoom));
 
 /*

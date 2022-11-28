@@ -85,7 +85,7 @@ const updateRoom = async ({ req, token }) => {
   return result;
 };
 
-const verifyTeacherJoinRoom = async ({ req, token }) => {
+const teacherJoinRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
       id: req.body.id,
@@ -112,7 +112,7 @@ const verifyTeacherJoinRoom = async ({ req, token }) => {
   return false;
 };
 
-const verifyStudentJoinRoom = async ({ req, token }) => {
+const studentJoinRoom = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
       id: req.body.room_id,
@@ -249,7 +249,7 @@ const studentCancelRequestJoinRoom = async ({ req, token }) => {
   return null;
 };
 
-const studentForceLeaveRoom = async ({ req, token }) => {
+const hardSubmission = async ({ req, token }) => {
   const persist = await model.Room.findOne({
     where: {
       id: req.body.room_id,
@@ -493,12 +493,12 @@ module.exports = {
   getRoomDetail,
   newRoom,
   updateRoom,
-  verifyTeacherJoinRoom,
-  verifyStudentJoinRoom,
+  teacherJoinRoom,
+  studentJoinRoom,
   teacherAcceptRequestJoinRoom,
   teacherRejectRequestJoinRoom,
   studentCancelRequestJoinRoom,
-  studentForceLeaveRoom,
+  hardSubmission,
   pointingRoom,
   closeRoom,
   teacherOpenRoom,
