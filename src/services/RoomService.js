@@ -3,6 +3,7 @@ const { Op } = require("sequelize");
 const model = require("../models");
 const { socketInstance } = require("../socket/instance");
 const { SocketEmitter } = require("../socket/keys");
+const moment = require("moment");
 
 const getRooms = async ({ req }) => {
   const result = await model.Room.findAll({
@@ -26,6 +27,29 @@ const getRoomDetail = async ({ req }) => {
 };
 
 const newRoom = async ({ req, token }) => {
+  // const rooms = await model.Room.findAll({
+  //   include: [{ model: model.Exam, required: false, where: { deleted: "N" } }],
+  //   where: {
+  //     group_id: req.body.group_id,
+  //   },
+  // });
+
+  // const valid = rooms.every((item) => {
+  //   const before = moment(req.body.start_date)
+  //     .add(parseInt(req.body.duration), "minutes")
+  //     .isBefore(moment(item.start_date));
+  //   const after = moment(req, req.body.start_date).isAfter(
+  //     moment(item.start_date).add(parseInt(item.tb_exam.duration), "minutes")
+  //   );
+  //   return before || after;
+  // });
+
+  // if (!valid) {
+  //   return null;
+  // }
+
+  // return true;
+
   const users = await model.User.findAll({
     where: {
       group_id: req.body.group_id,
