@@ -99,7 +99,7 @@ const pushResult = async ({ req, token }) => {
   });
 
   if (persist?.length > 0) {
-    if (req.body.type === "multiple") {
+    if (req.body.question_type === "multiple") {
       const existedResult = persist.find(
         (item) => item.selected_answer_id === req.body.selected_answer_id
       );
