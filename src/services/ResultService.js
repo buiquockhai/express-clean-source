@@ -90,7 +90,7 @@ const updateResult = async ({ req, token }) => {
 };
 
 const pushResult = async ({ req, token }) => {
-  const persist = await model.Result.findOne({
+  const persist = await model.Result.findAll({
     where: {
       room_id: req.body.room_id,
       question_id: req.body.question_id,
@@ -98,17 +98,46 @@ const pushResult = async ({ req, token }) => {
     },
   });
 
-  if (persist?.id) {
-    await model.Result.update(
-      {
-        selected_answer_id: req.body.selected_answer_id,
-        selected_answer_label: req.body.selected_answer_label,
-        updated_id: token.id,
-      },
-      {
-        where: { id: persist?.id },
+  if (persist?.length > 0) {
+    if (req.body.type === "multiple") {
+      const existedResult = persist.find(
+        (item) => item.selected_answer_id === req.body.selected_answer_id
+      );
+
+      if (existedResult?.id) {
+        await model.Result.update(
+          {
+            deleted: "Y",
+            updated_id: token.id,
+          },
+          {
+            where: { id: existedResult?.id },
+          }
+        );
+      } else {
+        await model.Result.create({
+          id: v4(),
+          room_id: req.body.room_id,
+          selected_answer_id: req.body.selected_answer_id,
+          selected_answer_label: req.body.selected_answer_label,
+          question_id: req.body.question_id,
+          created_id: token.id,
+          updated_id: token.id,
+          deleted: "N",
+        });
       }
-    );
+    } else {
+      await model.Result.update(
+        {
+          selected_answer_id: req.body.selected_answer_id,
+          selected_answer_label: req.body.selected_answer_label,
+          updated_id: token.id,
+        },
+        {
+          where: { id: persist?.[0]?.id },
+        }
+      );
+    }
   } else {
     await model.Result.create({
       id: v4(),
