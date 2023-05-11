@@ -1,5 +1,4 @@
-# literate-server
-
+# Public ExpressJS sample source structure
 
 
 ## Getting started
